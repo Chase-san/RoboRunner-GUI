@@ -36,8 +36,7 @@ public class BattleProcess {
 	public static void main(String[] args) {
 		args = getCombinedArgs(args);
 		String robocodePath = parseStringArgument("path", args, "Pass a path to Robocode with -path");
-		int numRounds = Integer
-				.parseInt(parseStringArgument("rounds", args, "Pass number of rounds width with -rounds"));
+		int numRounds = Integer.parseInt(parseStringArgument("rounds", args, "Pass number of rounds width with -rounds"));
 		int width = Integer.parseInt(parseStringArgument("width", args, "Pass battlefield width with -width"));
 		int height = Integer.parseInt(parseStringArgument("height", args, "Pass battlefield height with -height"));
 
@@ -70,8 +69,8 @@ public class BattleProcess {
 	}
 
 	public String runBattle(BotList botList) {
-		BattleSpecification battleSpec = new BattleSpecification(_numRounds, _battlefield,
-				_engine.getLocalRepository(COMMA_JOINER.join(botList.getBotNames())));
+		BattleSpecification battleSpec = new BattleSpecification(_numRounds, _battlefield, _engine.getLocalRepository(COMMA_JOINER
+				.join(botList.getBotNames())));
 		_engine.runBattle(battleSpec, true);
 		Multimap<String, RobotResults> resultsMap = _listener.getRobotResultsMap();
 		_listener.clear();
@@ -82,9 +81,8 @@ public class BattleProcess {
 		Set<String> resultStrings = Sets.newHashSet();
 		for (Map.Entry<String, RobotResults> resultsEntry : resultsMap.entries()) {
 			RobotResults results = resultsEntry.getValue();
-			resultStrings.add(resultsEntry.getKey() + SCORE_DELIMITER + results.getScore() + SCORE_DELIMITER
-					+ results.getFirsts() + SCORE_DELIMITER + results.getSurvival() + SCORE_DELIMITER
-					+ results.getBulletDamage());
+			resultStrings.add(resultsEntry.getKey() + SCORE_DELIMITER + results.getScore() + SCORE_DELIMITER + results.getFirsts()
+					+ SCORE_DELIMITER + results.getSurvival() + SCORE_DELIMITER + results.getBulletDamage());
 		}
 		return COLON_JOINER.join(resultStrings);
 	}

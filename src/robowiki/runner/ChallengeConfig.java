@@ -23,8 +23,8 @@ public class ChallengeConfig {
 	public final List<BotListGroup> referenceBotGroups;
 	public final List<BotList> allReferenceBots;
 
-	public ChallengeConfig(String name, int rounds, ScoringStyle scoringStyle, int battleFieldWidth,
-			int battleFieldHeight, List<BotListGroup> referenceBotGroups) {
+	public ChallengeConfig(String name, int rounds, ScoringStyle scoringStyle, int battleFieldWidth, int battleFieldHeight,
+			List<BotListGroup> referenceBotGroups) {
 		this.name = name;
 		this.rounds = rounds;
 		this.scoringStyle = scoringStyle;
@@ -83,8 +83,7 @@ public class ChallengeConfig {
 								if (botName.contains(".") && botName.contains(" ")) {
 									return false;
 								} else {
-									System.out.println("WARNING: " + botName + " doesn't look "
-											+ "like a bot name, ignoring.");
+									System.out.println("WARNING: " + botName + " doesn't look " + "like a bot name, ignoring.");
 									return true;
 								}
 							}
@@ -96,16 +95,15 @@ public class ChallengeConfig {
 			}
 
 			if (scoringStyle == ScoringStyle.MOVEMENT_CHALLENGE && maxBots > 2) {
-				throw new RuntimeException("Movement Challenge scoring doesn't work "
-						+ "for battles with more than 2 bots.");
+				throw new RuntimeException("Movement Challenge scoring doesn't work " + "for battles with more than 2 bots.");
 			}
 
 			if (!groupBots.isEmpty()) {
 				botGroups.add(new BotListGroup(groupName, groupBots));
 			}
 
-			return new ChallengeConfig(name, rounds, scoringStyle, (width == null ? 800 : width), (height == null ? 600
-					: height), botGroups);
+			return new ChallengeConfig(name, rounds, scoringStyle, (width == null ? 800 : width), (height == null ? 600 : height),
+					botGroups);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

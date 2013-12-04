@@ -176,8 +176,7 @@ public class ScoreLog {
 	 *             if the file doesn't exist
 	 * @throws IOException
 	 */
-	public static ScoreLog loadScoreLog(String inputFilePath) throws XMLStreamException, FileNotFoundException,
-			IOException {
+	public static ScoreLog loadScoreLog(String inputFilePath) throws XMLStreamException, FileNotFoundException, IOException {
 		ScoreLog scoreLog = null;
 		List<RobotScore> robotScores = null;
 		int numRounds = 0;
@@ -338,14 +337,14 @@ public class ScoreLog {
 		writeElement(eventWriter, name, numTabs, null, false);
 	}
 
-	private void writeElement(XMLEventWriter eventWriter, String name, int numTabs, List<Attribute> attributes,
-			boolean start) throws XMLStreamException {
+	private void writeElement(XMLEventWriter eventWriter, String name, int numTabs, List<Attribute> attributes, boolean start)
+			throws XMLStreamException {
 		for (int x = 0; x < numTabs; x++) {
 			eventWriter.add(XML_TAB);
 		}
 		if (start) {
-			eventWriter.add(XML_EVENT_FACTORY.createStartElement(new QName(name), (attributes == null ? null
-					: attributes.iterator()), null));
+			eventWriter
+					.add(XML_EVENT_FACTORY.createStartElement(new QName(name), (attributes == null ? null : attributes.iterator()), null));
 		} else {
 			eventWriter.add(XML_EVENT_FACTORY.createEndElement("", "", name));
 		}
@@ -356,8 +355,7 @@ public class ScoreLog {
 		writeValue(eventWriter, name, Long.toString(value), numTabs);
 	}
 
-	private void writeValue(XMLEventWriter eventWriter, String name, String value, int numTabs)
-			throws XMLStreamException {
+	private void writeValue(XMLEventWriter eventWriter, String name, String value, int numTabs) throws XMLStreamException {
 		for (int x = 0; x < numTabs; x++) {
 			eventWriter.add(XML_TAB);
 		}

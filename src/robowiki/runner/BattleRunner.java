@@ -29,8 +29,7 @@ public class BattleRunner {
 	private int _battleFieldWidth;
 	private int _battleFieldHeight;
 
-	public BattleRunner(Set<String> robocodeEnginePaths, String jvmArgs, int numRounds, int battleFieldWidth,
-			int battleFieldHeight) {
+	public BattleRunner(Set<String> robocodeEnginePaths, String jvmArgs, int numRounds, int battleFieldWidth, int battleFieldHeight) {
 		_numRounds = numRounds;
 		_battleFieldWidth = battleFieldWidth;
 		_battleFieldHeight = battleFieldHeight;
@@ -48,9 +47,8 @@ public class BattleRunner {
 			List<String> command = Lists.newArrayList();
 			command.add("java");
 			command.addAll(Lists.newArrayList(jvmArgs.trim().split(" +")));
-			command.addAll(Lists.newArrayList("-cp", System.getProperty("java.class.path"),
-					"robowiki.runner.BattleProcess", "-rounds", "" + _numRounds, "-width", "" + _battleFieldWidth,
-					"-height", "" + _battleFieldHeight, "-path", enginePath));
+			command.addAll(Lists.newArrayList("-cp", System.getProperty("java.class.path"), "robowiki.runner.BattleProcess", "-rounds", ""
+					+ _numRounds, "-width", "" + _battleFieldWidth, "-height", "" + _battleFieldHeight, "-path", enginePath));
 
 			System.out.print("Initializing engine: " + enginePath + "... ");
 			ProcessBuilder builder = new ProcessBuilder(command);

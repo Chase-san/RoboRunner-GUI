@@ -56,8 +56,7 @@ public class RobotScore {
 		this(botName, score, survivalRounds, survivalScore, bulletDamage, 0, 1);
 	}
 
-	public RobotScore(String botName, double score, double survivalRounds, double survivalScore, double bulletDamage,
-			double energyConserved) {
+	public RobotScore(String botName, double score, double survivalRounds, double survivalScore, double bulletDamage, double energyConserved) {
 		this(botName, score, survivalRounds, survivalScore, bulletDamage, energyConserved, 1);
 	}
 
@@ -96,8 +95,8 @@ public class RobotScore {
 	 */
 	public RobotScore getScoreRelativeTo(List<RobotScore> enemyScores, int numRounds) {
 		return new RobotScore(botName, getAverageScore(RobotScore.NORMAL_SCORER, enemyScores), getAverageScore(
-				RobotScore.SURVIVAL_FIRSTS_SCORER, enemyScores), getAverageScore(RobotScore.SURVIVAL_SCORER,
-				enemyScores), bulletDamage / numRounds, getAverageEnergyConserved(enemyScores, numRounds), numBattles);
+				RobotScore.SURVIVAL_FIRSTS_SCORER, enemyScores), getAverageScore(RobotScore.SURVIVAL_SCORER, enemyScores), bulletDamage
+				/ numRounds, getAverageEnergyConserved(enemyScores, numRounds), numBattles);
 	}
 
 	private double getAverageScore(Function<RobotScore, Double> scorer, Collection<RobotScore> enemyScores) {
@@ -134,22 +133,17 @@ public class RobotScore {
 
 		int addedBattles = score1.numBattles + score2.numBattles;
 		double score = ((score1.score * score1.numBattles) + (score2.score * score2.numBattles)) / addedBattles;
-		double rounds = ((score1.survivalRounds * score1.numBattles) + (score2.survivalRounds * score2.numBattles))
-				/ addedBattles;
-		double survival = ((score1.survivalScore * score1.numBattles) + (score2.survivalScore * score2.numBattles))
-				/ addedBattles;
-		double damage = ((score1.bulletDamage * score1.numBattles) + (score2.bulletDamage * score2.numBattles))
-				/ addedBattles;
-		double energy = ((score1.energyConserved * score1.numBattles) + (score2.energyConserved * score2.numBattles))
-				/ addedBattles;
+		double rounds = ((score1.survivalRounds * score1.numBattles) + (score2.survivalRounds * score2.numBattles)) / addedBattles;
+		double survival = ((score1.survivalScore * score1.numBattles) + (score2.survivalScore * score2.numBattles)) / addedBattles;
+		double damage = ((score1.bulletDamage * score1.numBattles) + (score2.bulletDamage * score2.numBattles)) / addedBattles;
+		double energy = ((score1.energyConserved * score1.numBattles) + (score2.energyConserved * score2.numBattles)) / addedBattles;
 		return new RobotScore(score1.botName, score, rounds, survival, damage, energy, addedBattles);
 	}
 
 	public enum ScoringStyle {
-		PERCENT_SCORE("Average Percent Score", NORMAL_SCORER, false), SURVIVAL_FIRSTS("Survival Firsts",
-				SURVIVAL_FIRSTS_SCORER, false), SURVIVAL_SCORE("Survival Score", SURVIVAL_SCORER, false), BULLET_DAMAGE(
-				"Bullet Damage", BULLET_DAMAGE_SCORER, true), MOVEMENT_CHALLENGE("Movement Challenge",
-				MOVEMENT_CHALLENGE_SCORER, true);
+		PERCENT_SCORE("Average Percent Score", NORMAL_SCORER, false), SURVIVAL_FIRSTS("Survival Firsts", SURVIVAL_FIRSTS_SCORER, false), SURVIVAL_SCORE(
+				"Survival Score", SURVIVAL_SCORER, false), BULLET_DAMAGE("Bullet Damage", BULLET_DAMAGE_SCORER, true), MOVEMENT_CHALLENGE(
+				"Movement Challenge", MOVEMENT_CHALLENGE_SCORER, true);
 
 		private String _description;
 		private Function<RobotScore, Double> _scorer;
