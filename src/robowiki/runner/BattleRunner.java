@@ -111,10 +111,6 @@ public class BattleRunner {
 		return ImmutableList.copyOf(robotScores);
 	}
 
-	private boolean isBattleResult(String line) {
-		return line != null && line.startsWith(BattleProcess.RESULT_SIGNAL);
-	}
-
 	public void shutdown() {
 		_threadPool.shutdown();
 		_callbackPool.shutdown();
@@ -150,6 +146,24 @@ public class BattleRunner {
 			_selector = selector;
 			_listener = listener;
 		}
+		
+		/**
+		 * Determines if the given line is a battle result.
+		 * @param line The input line.
+		 * @return <code>true</code> if it is a battle result, <code>false</code> otherwise.
+		 */
+		private boolean isBattleResult(String line) {
+			return line != null && line.startsWith(BattleProcess.RESULT_SIGNAL);
+		}
+		
+		/**
+		 * Determines if the given line is a round signal.
+		 * @param line The input line.
+		 * @return <code>true</code> if it is a round signal, <code>false</code> otherwise.
+		 */
+		private boolean isRoundSignal(String line) {
+			return line != null && line.startsWith(BattleProcess.ROUND_SIGNAL);
+		}
 
 		@Override
 		public String call() throws Exception {
@@ -173,8 +187,11 @@ public class BattleRunner {
 			String input;
 			do {
 				// TODO: How to handle other output, errors etc?
-				// TODO: Add round listening 
 				input = reader.readLine();
+				if(isRoundSignal(input)) {
+					int round = Integer.parseInt(input.substring(BattleProcess.ROUND_SIGNAL.length()));
+					//TODO pass this round value back somehow
+				}
 			} while (!isBattleResult(input));
 			final String result = input;
 			_processQueue.add(battleProcess);
