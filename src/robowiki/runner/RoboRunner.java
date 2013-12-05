@@ -158,8 +158,8 @@ public class RoboRunner {
 			_runningBotLists = Lists.newArrayList();
 			copyBots(_config.botsDirs);
 			if (!isMissingBots()) {
-				_battleRunner = new BattleRunner(_config.robocodePaths, _config.jvmArgs, _config.challenge.rounds,
-						_config.challenge.battleFieldWidth, _config.challenge.battleFieldHeight,false);
+				_battleRunner = new BattleRunner(_config.robocodePaths, _config.jvmArgs, false);
+				//_config.challenge.rounds, _config.challenge.battleFieldWidth, _config.challenge.battleFieldHeight
 			}
 		}
 	}
@@ -313,7 +313,8 @@ public class RoboRunner {
 						- scoreLog.getBattleCount(_config.challenge.allReferenceBots);
 				_battleRunner.runBattles(battleSelector, resultHandler, numBattles);
 			} else {
-				_battleRunner.runBattles(getBattleList(scoreLog, challenge, challenger), resultHandler);
+				_battleRunner.runBattles(getBattleList(scoreLog, challenge, challenger), resultHandler,
+						challenge.rounds, challenge.battleFieldWidth, challenge.battleFieldHeight);
 			}
 			System.out.println();
 			System.out.println("Done! Took " + formatBattleTime(System.nanoTime() - startTime));
@@ -682,7 +683,6 @@ public class RoboRunner {
 				if (!battleList.isEmpty()) {
 					return battleList.remove();
 				}
-				;
 
 				int minBattles = getMinBattles(errorMap);
 				double randomBattleChance = SMART_BATTLE_RANDOM_RATE / power(2, minBattles - 2);
@@ -716,6 +716,21 @@ public class RoboRunner {
 				List<String> nextBotList = Lists.newArrayList(nextBotListString.split(","));
 				nextBotList.add(challenger);
 				return new BotList(nextBotList);
+			}
+
+			@Override
+			public int nextNumRounds() {
+				return challenge.rounds;
+			}
+
+			@Override
+			public int nextBattlefieldWidth() {
+				return challenge.battleFieldWidth;
+			}
+
+			@Override
+			public int nextBattlefieldHeight() {
+				return challenge.battleFieldHeight;
 			}
 		};
 	}

@@ -26,17 +26,9 @@ public class BattleRunner {
 	private Queue<Process> _processQueue;
 	private ExecutorService _threadPool;
 	private ExecutorService _callbackPool;
-	private int _numRounds;
-	private int _battleFieldWidth;
-	private int _battleFieldHeight;
 	private boolean _roundSignals;
 
-	public BattleRunner(Set<String> robocodeEnginePaths, String jvmArgs, int numRounds, int battleFieldWidth, int battleFieldHeight,
-			boolean requestRoundSignals) {
-		_numRounds = numRounds;
-		_battleFieldWidth = battleFieldWidth;
-		_battleFieldHeight = battleFieldHeight;
-		
+	public BattleRunner(Set<String> robocodeEnginePaths, String jvmArgs, boolean requestRoundSignals) {
 		_roundSignals = requestRoundSignals;
 
 		_threadPool = Executors.newFixedThreadPool(robocodeEnginePaths.size(), new BattleThreadFactory());
@@ -73,11 +65,12 @@ public class BattleRunner {
 		}
 	}
 
-	public void runBattles(List<BotList> botLists, BattleOutputHandler handler) {
+	public void runBattles(List<BotList> botLists, BattleOutputHandler handler,
+			int numRounds, int battlefieldWidth, int battlefieldHeight) {
 		List<Future<String>> futures = Lists.newArrayList();
 		for (final BotList botList : botLists) {
 			futures.add(_threadPool.submit(
-						new BattleCallable(botList, handler,_numRounds, _battleFieldWidth, _battleFieldHeight)
+						new BattleCallable(botList, handler, numRounds, battlefieldWidth, battlefieldHeight)
 					));
 		}
 		getAllFutures(futures);
@@ -86,9 +79,7 @@ public class BattleRunner {
 	public void runBattles(BattleSelector selector, BattleOutputHandler handler, int numBattles) {
 		List<Future<String>> futures = Lists.newArrayList();
 		for (int x = 0; x < numBattles; x++) {
-			futures.add(_threadPool.submit(
-					new BattleCallable(selector, handler,_numRounds, _battleFieldWidth, _battleFieldHeight)
-					));
+			futures.add(_threadPool.submit(new BattleCallable(selector, handler)));
 		}
 		getAllFutures(futures);
 	}
@@ -142,6 +133,9 @@ public class BattleRunner {
 	}
 
 	public interface BattleSelector {
+		int nextNumRounds();
+		int nextBattlefieldWidth();
+		int nextBattlefieldHeight();
 		BotList nextBotList();
 	}
 	
@@ -175,8 +169,7 @@ public class BattleRunner {
 			_battlefieldHeight = battlefieldHeight;
 		}
 
-		public BattleCallable(BattleSelector selector, BattleOutputHandler listener,
-				int numRounds, int battlefieldWidth, int battlefieldHeight) {
+		public BattleCallable(BattleSelector selector, BattleOutputHandler listener) {
 			_selector = selector;
 			_listener = listener;
 		}
