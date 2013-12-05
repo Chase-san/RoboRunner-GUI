@@ -28,9 +28,8 @@ public class BattleRunner {
 	private ExecutorService _callbackPool;
 	private boolean _roundSignals;
 
-	public BattleRunner(Set<String> robocodeEnginePaths, String jvmArgs, boolean requestRoundSignals) {
-		_roundSignals = requestRoundSignals;
-
+	public BattleRunner(Set<String> robocodeEnginePaths, String jvmArgs, boolean requestRoundOutput) {
+		_roundSignals = requestRoundOutput;
 		_threadPool = Executors.newFixedThreadPool(robocodeEnginePaths.size(), new BattleThreadFactory());
 		_callbackPool = Executors.newFixedThreadPool(1);
 		_processQueue = Queues.newConcurrentLinkedQueue();
@@ -119,15 +118,23 @@ public class BattleRunner {
 	}
 
 	public interface BattleOutputHandler {
+		/**
+		 * Processes a new battle for the given thread.
+		 * @param id The thread id.
+		 * @param list The list of robots in the battle.
+		 */
 		void processNewBattle(int id, BotList list);
+		/**
+		 * Processes a new round from a battle.
+		 * @param id The thread id.
+		 * @param round The round number.
+		 */
 		void processRound(int id, int round);
 		/**
 		 * Processes the scores from a battle.
-		 * 
-		 * @param robotScores
-		 *            scores for each robot in the battle
-		 * @param elapsedTime
-		 *            elapsed time of the battle, in nanoseconds
+		 * @param id The thread id.
+		 * @param robotScores Scores for each robot in the battle.
+		 * @param elapsedTime Elapsed time of the battle, in nanoseconds.
 		 */
 		void processResults(int id, List<RobotScore> robotScores, long elapsedTime);
 	}
@@ -204,13 +211,22 @@ public class BattleRunner {
 			
 			if (_selector == null) {
 				botList = _botList;
-			} else {
+			} else { 
+				//why does this need to run through the callback pool?
+				/*
 				botList = _callbackPool.submit(new Callable<BotList>() {
 					@Override
 					public BotList call() throws Exception {
 						return _selector.nextBotList();
 					}
 				}).get();
+				*/
+				
+				//Until I can figure out a better way to do it.
+				_numRounds = _selector.nextNumRounds();
+				_battlefieldWidth = _selector.nextBattlefieldWidth();
+				_battlefieldHeight = _selector.nextBattlefieldHeight();
+				botList = _selector.nextBotList();
 			}
 			
 			_callbackPool.submit(new Runnable() {
@@ -228,6 +244,7 @@ public class BattleRunner {
 			do {
 				// TODO: How to handle other output, errors etc?
 				input = reader.readLine();
+				System.out.println(input);
 				if(_roundSignals && isRoundSignal(input)) {
 					final int round = Integer.parseInt(input.substring(BattleProcess.ROUND_SIGNAL.length()));
 					_callbackPool.submit(new Runnable() {
