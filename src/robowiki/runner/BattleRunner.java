@@ -13,6 +13,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadFactory;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -34,7 +35,7 @@ public class BattleRunner {
 		_battleFieldWidth = battleFieldWidth;
 		_battleFieldHeight = battleFieldHeight;
 
-		_threadPool = Executors.newFixedThreadPool(robocodeEnginePaths.size());
+		_threadPool = Executors.newFixedThreadPool(robocodeEnginePaths.size(), new BattleThreadFactory());
 		_callbackPool = Executors.newFixedThreadPool(1);
 		_processQueue = Queues.newConcurrentLinkedQueue();
 		for (String enginePath : robocodeEnginePaths) {
@@ -66,7 +67,7 @@ public class BattleRunner {
 		}
 	}
 
-	public void runBattles(List<BotList> botLists, BattleResultHandler handler) {
+	public void runBattles(List<BotList> botLists, BattleOutputHandler handler) {
 		List<Future<String>> futures = Lists.newArrayList();
 		for (final BotList botList : botLists) {
 			futures.add(_threadPool.submit(new BattleCallable(botList, handler)));
@@ -74,7 +75,7 @@ public class BattleRunner {
 		getAllFutures(futures);
 	}
 
-	public void runBattles(BattleSelector selector, BattleResultHandler handler, int numBattles) {
+	public void runBattles(BattleSelector selector, BattleOutputHandler handler, int numBattles) {
 		List<Future<String>> futures = Lists.newArrayList();
 		for (int x = 0; x < numBattles; x++) {
 			futures.add(_threadPool.submit(new BattleCallable(selector, handler)));
@@ -116,7 +117,9 @@ public class BattleRunner {
 		_callbackPool.shutdown();
 	}
 
-	public interface BattleResultHandler {
+	public interface BattleOutputHandler {
+		void processNewBattle(int id, BotList list);
+		void processRound(int id, int round);
 		/**
 		 * Processes the scores from a battle.
 		 * 
@@ -125,24 +128,37 @@ public class BattleRunner {
 		 * @param elapsedTime
 		 *            elapsed time of the battle, in nanoseconds
 		 */
-		void processResults(List<RobotScore> robotScores, long elapsedTime);
+		void processResults(int id, List<RobotScore> robotScores, long elapsedTime);
 	}
 
 	public interface BattleSelector {
 		BotList nextBotList();
 	}
+	
+	private static class BattleThreadFactory implements ThreadFactory {
+		int _counter = 0;
+		@Override
+		public Thread newThread(Runnable r) {
+			return new Thread(r,""+_counter++);
+		}
+	}
 
+	/**
+	 * Calls and handles the actual battle.
+	 * @author Voidious
+	 */
 	private class BattleCallable implements Callable<String> {
 		private BotList _botList;
 		private BattleSelector _selector;
-		private BattleResultHandler _listener;
+		private BattleOutputHandler _listener;
+		private int _id = 0;
 
-		public BattleCallable(BotList botList, BattleResultHandler listener) {
+		public BattleCallable(BotList botList, BattleOutputHandler listener) {
 			_botList = botList;
 			_listener = listener;
 		}
 
-		public BattleCallable(BattleSelector selector, BattleResultHandler listener) {
+		public BattleCallable(BattleSelector selector, BattleOutputHandler listener) {
 			_selector = selector;
 			_listener = listener;
 		}
@@ -171,7 +187,10 @@ public class BattleRunner {
 			Process battleProcess = _processQueue.poll();
 			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(battleProcess.getOutputStream()));
 			BufferedReader reader = new BufferedReader(new InputStreamReader(battleProcess.getInputStream()));
-			BotList botList;
+			final BotList botList;
+			
+			_id = Integer.parseInt(Thread.currentThread().getName());
+			
 			if (_selector == null) {
 				botList = _botList;
 			} else {
@@ -182,6 +201,14 @@ public class BattleRunner {
 					}
 				}).get();
 			}
+			
+			_callbackPool.submit(new Runnable() {
+				@Override
+				public void run() {
+					_listener.processNewBattle(_id, botList);
+				}
+			});
+			
 			writer.append(COMMA_JOINER.join(botList.getBotNames()) + "\n");
 			writer.flush();
 			String input;
@@ -189,16 +216,24 @@ public class BattleRunner {
 				// TODO: How to handle other output, errors etc?
 				input = reader.readLine();
 				if(isRoundSignal(input)) {
-					int round = Integer.parseInt(input.substring(BattleProcess.ROUND_SIGNAL.length()));
-					//TODO pass this round value back somehow
+					final int round = Integer.parseInt(input.substring(BattleProcess.ROUND_SIGNAL.length()));
+					_callbackPool.submit(new Runnable() {
+						@Override
+						public void run() {
+							//TODO check if the callback pool runs quick enough to allow this, otherwise...
+							_listener.processRound(_id, round);
+							
+						}
+					});
 				}
 			} while (!isBattleResult(input));
+			
 			final String result = input;
 			_processQueue.add(battleProcess);
 			_callbackPool.submit(new Runnable() {
 				@Override
 				public void run() {
-					_listener.processResults(getRobotScoreList(result), System.nanoTime() - startTime);
+					_listener.processResults(_id,getRobotScoreList(result), System.nanoTime() - startTime);
 				}
 			}).get();
 			return result;

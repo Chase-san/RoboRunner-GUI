@@ -20,7 +20,7 @@ import java.util.Set;
 
 import javax.xml.stream.XMLStreamException;
 
-import robowiki.runner.BattleRunner.BattleResultHandler;
+import robowiki.runner.BattleRunner.BattleOutputHandler;
 import robowiki.runner.BattleRunner.BattleSelector;
 import robowiki.runner.ChallengeConfig.BotListGroup;
 import robowiki.runner.RobotScore.ScoringStyle;
@@ -304,7 +304,7 @@ public class RoboRunner {
 		});
 
 		if (_config.seasons > 0) {
-			BattleResultHandler resultHandler = newBattleResultHandler(scoreLog, challenge, challenger, xmlFilePath, errorMap,
+			BattleOutputHandler resultHandler = newBattleResultHandler(scoreLog, challenge, challenger, xmlFilePath, errorMap,
 					printWikiFormat);
 			if (_config.smartBattles) {
 				BattleSelector battleSelector = newBattleSelector(getBattleList(scoreLog, challenge, challenger, 2), challenge, challenger,
@@ -641,12 +641,12 @@ public class RoboRunner {
 		return r;
 	}
 
-	private BattleResultHandler newBattleResultHandler(final ScoreLog scoreLog, final ChallengeConfig challenge, final String challenger,
+	private BattleOutputHandler newBattleResultHandler(final ScoreLog scoreLog, final ChallengeConfig challenge, final String challenger,
 			final String xmlFilePath, final Map<String, ScoreError> errorMap, final boolean printWikiFormat) {
 		final ScoringStyle scoringStyle = challenge.scoringStyle;
-		return new BattleResultHandler() {
+		return new BattleOutputHandler() {
 			@Override
-			public void processResults(List<RobotScore> robotScores, long elapsedTime) {
+			public void processResults(int id, List<RobotScore> robotScores, long elapsedTime) {
 				scoreLog.addBattle(robotScores, challenge.rounds, elapsedTime);
 				scoreLog.saveScoreLog(xmlFilePath);
 
@@ -661,6 +661,14 @@ public class RoboRunner {
 				}
 				printOverallScores(scoreLog, errorMap, challenger, challenge, printWikiFormat, false);
 				_runningBotLists.remove(botList);
+			}
+
+			@Override
+			public void processNewBattle(int id, BotList list) {
+			}
+
+			@Override
+			public void processRound(int id, int round) {
 			}
 		};
 	}
