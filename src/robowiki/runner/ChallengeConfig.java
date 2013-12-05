@@ -51,9 +51,13 @@ public class ChallengeConfig {
 		return referenceBotGroups.size() > 1;
 	}
 
-	public static ChallengeConfig load(String challengeFilePath) {
+	public static ChallengeConfig load(String challengeFileName) {
+		return load(new File(challengeFileName));
+	}
+	
+	public static ChallengeConfig load(File challengeFile) {
 		try {
-			List<String> fileLines = Files.readLines(new File(challengeFilePath), Charset.defaultCharset());
+			List<String> fileLines = Files.readLines(challengeFile, Charset.defaultCharset());
 			String name = fileLines.get(0);
 			ScoringStyle scoringStyle = ScoringStyle.parseStyle(fileLines.get(1).trim());
 			int rounds = Integer.parseInt(fileLines.get(2).toLowerCase().replaceAll("rounds", "").trim());

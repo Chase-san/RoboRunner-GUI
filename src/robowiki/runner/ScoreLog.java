@@ -1,5 +1,6 @@
 package robowiki.runner;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -252,6 +253,10 @@ public class ScoreLog {
 			}
 		}
 	}
+	
+	public void saveScoreLog(String outputFilePath) {
+		saveScoreLog(new File(outputFilePath));
+	}
 
 	/**
 	 * Save the scores to an output file in XML format.
@@ -259,11 +264,11 @@ public class ScoreLog {
 	 * @param outputFilePath
 	 *            the path of the output file
 	 */
-	public void saveScoreLog(String outputFilePath) {
+	public void saveScoreLog(File outputFile) {
 		XMLEventWriter eventWriter = null;
 		GZIPOutputStream gzipOutputStream = null;
 		try {
-			gzipOutputStream = new GZIPOutputStream(new FileOutputStream(outputFilePath));
+			gzipOutputStream = new GZIPOutputStream(new FileOutputStream(outputFile));
 			eventWriter = XMLOutputFactory.newInstance().createXMLEventWriter(gzipOutputStream);
 			eventWriter.add(XML_EVENT_FACTORY.createStartDocument());
 			eventWriter.add(XML_NL);
