@@ -12,6 +12,11 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.io.Files;
 
+/**
+ * This class handles the loading and storage of Challenge Files.
+ * @author Voidious
+ *
+ */
 public class ChallengeConfig {
 	public static final String DEFAULT_GROUP = "";
 
@@ -110,6 +115,10 @@ public class ChallengeConfig {
 		return null;
 	}
 
+	/**
+	 * Defines a group of robots used in the challenge. 
+	 * @author Voidious
+	 */
 	public static class BotListGroup {
 		public final String name;
 		public final List<BotList> referenceBots;

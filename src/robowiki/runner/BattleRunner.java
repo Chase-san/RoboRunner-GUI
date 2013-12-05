@@ -69,7 +69,7 @@ public class BattleRunner {
 	public void runBattles(List<BotList> botLists, BattleResultHandler handler) {
 		List<Future<String>> futures = Lists.newArrayList();
 		for (final BotList botList : botLists) {
-			futures.add(_threadPool.submit(newBattleCallable(botList, handler)));
+			futures.add(_threadPool.submit(new BattleCallable(botList, handler)));
 		}
 		getAllFutures(futures);
 	}
@@ -77,7 +77,7 @@ public class BattleRunner {
 	public void runBattles(BattleSelector selector, BattleResultHandler handler, int numBattles) {
 		List<Future<String>> futures = Lists.newArrayList();
 		for (int x = 0; x < numBattles; x++) {
-			futures.add(_threadPool.submit(newBattleCallable(selector, handler)));
+			futures.add(_threadPool.submit(new BattleCallable(selector, handler)));
 		}
 		getAllFutures(futures);
 	}
@@ -92,14 +92,6 @@ public class BattleRunner {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	private Callable<String> newBattleCallable(BotList botList, BattleResultHandler handler) {
-		return new BattleCallable(botList, handler);
-	}
-
-	private Callable<String> newBattleCallable(BattleSelector selector, BattleResultHandler handler) {
-		return new BattleCallable(selector, handler);
 	}
 
 	private List<RobotScore> getRobotScoreList(String battleResults) {
@@ -181,6 +173,7 @@ public class BattleRunner {
 			String input;
 			do {
 				// TODO: How to handle other output, errors etc?
+				// TODO: Add round listening 
 				input = reader.readLine();
 			} while (!isBattleResult(input));
 			final String result = input;

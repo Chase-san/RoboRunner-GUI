@@ -58,8 +58,9 @@ public class RoboRunner {
 				+ "testbed.rrc");
 		int seasons = -1;
 		try {
-			seasons = Integer
-					.parseInt(parseStringArgument("seasons", args, "ERROR: Pass number of seasons with -seasons, eg: -seasons 10"));
+			String help = "ERROR: Pass number of seasons with -seasons, eg: -seasons 10";
+			String arg = parseStringArgument("seasons", args, help);
+			seasons = Integer.parseInt(arg);
 		} catch (NumberFormatException nfe) {
 			// semi-expected
 		}
@@ -149,7 +150,8 @@ public class RoboRunner {
 
 	public RoboRunner(String challengerBot, String challengeFilePath, int seasons, int threads, boolean forceWikiOutput,
 			boolean smartBattles) {
-		_config = loadConfig(Preconditions.checkNotNull(challengerBot), Preconditions.checkNotNull(challengeFilePath), seasons, threads,
+		_config = loadConfig(Preconditions.checkNotNull(challengerBot),
+				Preconditions.checkNotNull(challengeFilePath), seasons, threads,
 				forceWikiOutput, smartBattles);
 		if (seasons > 0) {
 			_missingBots = false;
