@@ -141,9 +141,11 @@ public class RobotScore {
 	}
 
 	public enum ScoringStyle {
-		PERCENT_SCORE("Average Percent Score", NORMAL_SCORER, false), SURVIVAL_FIRSTS("Survival Firsts", SURVIVAL_FIRSTS_SCORER, false), SURVIVAL_SCORE(
-				"Survival Score", SURVIVAL_SCORER, false), BULLET_DAMAGE("Bullet Damage", BULLET_DAMAGE_SCORER, true), MOVEMENT_CHALLENGE(
-				"Movement Challenge", MOVEMENT_CHALLENGE_SCORER, true);
+		PERCENT_SCORE("Average Percent Score", NORMAL_SCORER, false),
+		SURVIVAL_FIRSTS("Survival Firsts", SURVIVAL_FIRSTS_SCORER, false),
+		SURVIVAL_SCORE("Survival Score", SURVIVAL_SCORER, false),
+		BULLET_DAMAGE("Bullet Damage", BULLET_DAMAGE_SCORER, true),
+		MOVEMENT_CHALLENGE("Movement Challenge", MOVEMENT_CHALLENGE_SCORER, true);
 
 		private String _description;
 		private Function<RobotScore, Double> _scorer;
