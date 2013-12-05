@@ -7,6 +7,7 @@ import static robowiki.runner.RunnerUtil.parseBooleanArgument;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,7 +18,7 @@ import robocode.control.RobotResults;
 import robocode.control.RobotSpecification;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
@@ -36,23 +37,19 @@ public class BattleProcess {
 	public static final String BOT_DELIMITER = ":::";
 	public static final String SCORE_DELIMITER = "::";
 
-	private static final Joiner COMMA_JOINER = Joiner.on(",");
+	private static final Joiner COMMA_JOINER = Joiner.on(',');
+	private static final Splitter COMMA_SPLITTER = Splitter.on(',');
 	private static final Joiner COLON_JOINER = Joiner.on(BOT_DELIMITER);
 
-	private BattlefieldSpecification _battlefield;
 	private RobocodeEngine _engine;
 	private BattleListener _listener;
-	private int _numRounds;
 
 	public static void main(String[] args) {
 		args = getCombinedArgs(args);
 		String robocodePath = parseStringArgument("path", args, "Pass a path to Robocode with -path");
-		int numRounds = Integer.parseInt(parseStringArgument("rounds", args, "Pass number of rounds width with -rounds"));
-		int width = Integer.parseInt(parseStringArgument("width", args, "Pass battlefield width with -width"));
-		int height = Integer.parseInt(parseStringArgument("height", args, "Pass battlefield height with -height"));
 		boolean sendRoundSignals = parseBooleanArgument("srounds", args);
 
-		BattleProcess process = new BattleProcess(robocodePath, numRounds, width, height, sendRoundSignals);
+		BattleProcess process = new BattleProcess(robocodePath, sendRoundSignals);
 		System.out.println(READY_SIGNAL);
 		BufferedReader stdin = new BufferedReader(new java.io.InputStreamReader(System.in));
 
@@ -61,7 +58,8 @@ public class BattleProcess {
 			try {
 				String line = stdin.readLine();
 				System.out.println("Processing " + line);
-				String result = process.runBattle(getBotList(line));
+				
+				String result = process.runBattle(process.getBattleSpecification(line));
 				System.out.println(RESULT_SIGNAL + result);
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -69,26 +67,41 @@ public class BattleProcess {
 		}
 	}
 
-	private static BotList getBotList(String line) {
-		return new BotList(Lists.newArrayList(line.split(",")));
-	}
-
-	public BattleProcess(String robocodePath, int numRounds, int battleFieldWidth, int battleFieldHeight, boolean sendRoundSignals) {
-		_numRounds = numRounds;
-		_battlefield = new BattlefieldSpecification(battleFieldWidth, battleFieldHeight);
+	public BattleProcess(String robocodePath, boolean sendRoundSignals) {
 		_engine = new RobocodeEngine(new File(robocodePath));
 		_listener = new BattleListener(sendRoundSignals);
 		_engine.addBattleListener(_listener);
 		_engine.setVisible(false);
 	}
-
-	public String runBattle(BotList botList) {
+	
+	public String runBattle(int numRounds, int battlefieldWidth, int battlefieldHeight, BotList botList) {
+		BattlefieldSpecification battlefield = new BattlefieldSpecification(battlefieldWidth, battlefieldHeight);
 		RobotSpecification[] robots = _engine.getLocalRepository(COMMA_JOINER.join(botList.getBotNames()));
-		BattleSpecification battleSpec = new BattleSpecification(_numRounds, _battlefield, robots);
+		BattleSpecification battleSpec = new BattleSpecification(numRounds,battlefield,robots);
 		_engine.runBattle(battleSpec, true);
 		Multimap<String, RobotResults> resultsMap = _listener.getRobotResultsMap();
 		_listener.clear();
 		return battleResultString(resultsMap);
+	}
+
+	public String runBattle(BattleSpecification battleSpec) {
+		_engine.runBattle(battleSpec, true);
+		Multimap<String, RobotResults> resultsMap = _listener.getRobotResultsMap();
+		_listener.clear();
+		return battleResultString(resultsMap);
+	}
+	
+	private BattleSpecification getBattleSpecification(String line) {
+		List<String> config = COMMA_SPLITTER.splitToList(line);
+		int numRounds = Integer.parseInt(config.get(0));
+		int width = Integer.parseInt(config.get(1));
+		int height = Integer.parseInt(config.get(2));
+		
+		BattlefieldSpecification battlefield = new BattlefieldSpecification(width, height);
+		config = config.subList(3, config.size());
+		RobotSpecification[] robots = _engine.getLocalRepository(COMMA_JOINER.join(config));
+		
+		return new BattleSpecification(numRounds,battlefield,robots);
 	}
 
 	private String battleResultString(Multimap<String, RobotResults> resultsMap) {

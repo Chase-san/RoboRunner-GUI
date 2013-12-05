@@ -52,8 +52,7 @@ public class BattleRunner {
 			List<String> command = Lists.newArrayList();
 			command.add("java");
 			command.addAll(Lists.newArrayList(jvmArgs.trim().split(" +")));
-			command.addAll(Lists.newArrayList("-cp", System.getProperty("java.class.path"), "robowiki.runner.BattleProcess", "-rounds", ""
-					+ _numRounds, "-width", "" + _battleFieldWidth, "-height", "" + _battleFieldHeight, "-path", enginePath));
+			command.addAll(Lists.newArrayList("-cp", System.getProperty("java.class.path"), "robowiki.runner.BattleProcess", "-path", enginePath));
 			if(_roundSignals) {
 				command.add("-srounds");
 			}
@@ -77,7 +76,9 @@ public class BattleRunner {
 	public void runBattles(List<BotList> botLists, BattleOutputHandler handler) {
 		List<Future<String>> futures = Lists.newArrayList();
 		for (final BotList botList : botLists) {
-			futures.add(_threadPool.submit(new BattleCallable(botList, handler)));
+			futures.add(_threadPool.submit(
+						new BattleCallable(botList, handler,_numRounds, _battleFieldWidth, _battleFieldHeight)
+					));
 		}
 		getAllFutures(futures);
 	}
@@ -85,7 +86,9 @@ public class BattleRunner {
 	public void runBattles(BattleSelector selector, BattleOutputHandler handler, int numBattles) {
 		List<Future<String>> futures = Lists.newArrayList();
 		for (int x = 0; x < numBattles; x++) {
-			futures.add(_threadPool.submit(new BattleCallable(selector, handler)));
+			futures.add(_threadPool.submit(
+					new BattleCallable(selector, handler,_numRounds, _battleFieldWidth, _battleFieldHeight)
+					));
 		}
 		getAllFutures(futures);
 	}
@@ -155,17 +158,25 @@ public class BattleRunner {
 	 * @author Voidious
 	 */
 	private class BattleCallable implements Callable<String> {
+		private int _battlefieldWidth;
+		private int _battlefieldHeight;
+		private int _numRounds;
 		private BotList _botList;
 		private BattleSelector _selector;
 		private BattleOutputHandler _listener;
 		private int _id = 0;
 
-		public BattleCallable(BotList botList, BattleOutputHandler listener) {
+		public BattleCallable(BotList botList, BattleOutputHandler listener,
+				int numRounds, int battlefieldWidth, int battlefieldHeight) {
 			_botList = botList;
 			_listener = listener;
+			_numRounds = numRounds;
+			_battlefieldWidth = battlefieldWidth;
+			_battlefieldHeight = battlefieldHeight;
 		}
 
-		public BattleCallable(BattleSelector selector, BattleOutputHandler listener) {
+		public BattleCallable(BattleSelector selector, BattleOutputHandler listener,
+				int numRounds, int battlefieldWidth, int battlefieldHeight) {
 			_selector = selector;
 			_listener = listener;
 		}
@@ -215,8 +226,10 @@ public class BattleRunner {
 					_listener.processNewBattle(_id, botList);
 				}
 			});
-			
-			writer.append(COMMA_JOINER.join(botList.getBotNames()) + "\n");
+
+			List<String> battleConfig = Lists.newArrayList("" + _numRounds, "" + _battlefieldWidth, "" + _battlefieldHeight);
+			battleConfig.addAll(botList.getBotNames());
+			writer.append(COMMA_JOINER.join(battleConfig) + "\n");
 			writer.flush();
 			String input;
 			do {
