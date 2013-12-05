@@ -8,6 +8,8 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileFilter;
 
 import net.miginfocom.swing.MigLayout;
@@ -21,10 +23,15 @@ import javax.swing.JCheckBox;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.SpinnerNumberModel;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.Files;
+
 import chase.EndsWithFileFilter;
+import chase.Strings;
 import chase.WindowToolkit;
 
 /**
@@ -43,7 +50,6 @@ public class AddDialog extends JDialog {
 	private JCheckBox chckbxAuto;
 	private JSpinner spnSeasons;
 	
-	private String robotAlias = "";
 	private String challengeName = "";
 
 	public AddDialog(Window parent) {
@@ -85,6 +91,7 @@ public class AddDialog extends JDialog {
 		}
 		{
 			txtChallenge = new JTextField();
+			txtChallenge.setEditable(false);
 			contentPanel.add(txtChallenge, "cell 1 1,growx");
 			txtChallenge.setColumns(10);
 		}
@@ -103,6 +110,20 @@ public class AddDialog extends JDialog {
 		}
 		{
 			txtRobot = new JTextField();
+			txtRobot.getDocument().addDocumentListener(new DocumentListener() {
+				@Override
+				public void insertUpdate(DocumentEvent e) {
+					updateTitle();
+				}
+				@Override
+				public void removeUpdate(DocumentEvent e) {
+					updateTitle();
+				}
+				@Override
+				public void changedUpdate(DocumentEvent e) {
+					updateTitle();
+				}
+			});
 			contentPanel.add(txtRobot, "cell 1 2,growx");
 			txtRobot.setColumns(10);
 		}
@@ -164,6 +185,14 @@ public class AddDialog extends JDialog {
 	
 	private void updateTitle() {
 		if(chckbxAuto.isSelected()) {
+			String robotAlias = "";
+			if(txtRobot.getText().indexOf(' ') != -1) {
+				String[] robotTextParts = Strings.split(txtRobot.getText(), ' ');
+				if(robotTextParts.length > 1)
+					robotAlias = robotTextParts[0].substring(
+							robotTextParts[0].indexOf('.')+1) + " " + robotTextParts[1];
+			}
+			
 			txtTitle.setText(robotAlias + " - " + challengeName);
 		}
 	}
@@ -171,7 +200,7 @@ public class AddDialog extends JDialog {
 	private void browseForChallenge() {
 		if(rrcChooser == null) {
 			//TODO move this definition elsewhere
-			String directory = "challenges";
+			String directory = "scripts";
 			new File(directory).mkdirs();
 			WindowToolkit.setFileChooserReadOnly(true);
 			rrcChooser = new JFileChooser(directory);
@@ -182,6 +211,15 @@ public class AddDialog extends JDialog {
 		if(rrcChooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
 			return;
 		}
+		File file = rrcChooser.getSelectedFile();
+		txtChallenge.setText(file.getAbsolutePath());
+		try {
+			challengeName = Files.readFirstLine(file, Charsets.UTF_8);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		updateTitle();
 	}
 
 	private void browseForRobot() {
@@ -198,8 +236,15 @@ public class AddDialog extends JDialog {
 		if(botChooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
 			return;
 		}
+		File file = botChooser.getSelectedFile();
+		
+		String robotText = Files.getNameWithoutExtension(file.getName()).replace('_', ' ');
+		txtRobot.setText(robotText);
+		
+		updateTitle();
 	}
 	
 	private void addChallenge() {
+		//TODO add challenge to queue
 	}
 }

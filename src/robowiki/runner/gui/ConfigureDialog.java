@@ -66,7 +66,7 @@ public class ConfigureDialog extends JDialog {
 			txtTitle = new JTextField();
 			contentPanel.add(txtTitle, "cell 1 0,growx");
 			txtTitle.setColumns(10);
-			//txtTitle.setText(spec.getTitle());
+			//TODO txtTitle.setText(spec.getTitle());
 		}
 		{
 			JLabel lblSeasons = new JLabel("Seasons");
@@ -75,7 +75,7 @@ public class ConfigureDialog extends JDialog {
 		{
 			spnSeasons = new JSpinner();
 			spnSeasons.setModel(new SpinnerNumberModel(new Integer(1), new Integer(1), null, new Integer(1)));
-			//spnSeasons.setValue(spec.getSeasons());
+			//TODO spnSeasons.setValue(spec.getSeasons());
 			contentPanel.add(spnSeasons, "cell 1 1,growx");
 		}
 		{
@@ -129,7 +129,7 @@ public class ConfigureDialog extends JDialog {
 	}
 	
 	private void saveConfiguration() {
-		
+		//TODO save configuration
 	}
 	
 	private void resetTitle() {
