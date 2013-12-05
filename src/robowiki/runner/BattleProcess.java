@@ -50,7 +50,7 @@ public class BattleProcess {
 		int numRounds = Integer.parseInt(parseStringArgument("rounds", args, "Pass number of rounds width with -rounds"));
 		int width = Integer.parseInt(parseStringArgument("width", args, "Pass battlefield width with -width"));
 		int height = Integer.parseInt(parseStringArgument("height", args, "Pass battlefield height with -height"));
-		boolean sendRoundSignals = parseBooleanArgument("-rounds", args);
+		boolean sendRoundSignals = parseBooleanArgument("srounds", args);
 
 		BattleProcess process = new BattleProcess(robocodePath, numRounds, width, height, sendRoundSignals);
 		System.out.println(READY_SIGNAL);

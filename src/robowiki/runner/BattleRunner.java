@@ -55,7 +55,7 @@ public class BattleRunner {
 			command.addAll(Lists.newArrayList("-cp", System.getProperty("java.class.path"), "robowiki.runner.BattleProcess", "-rounds", ""
 					+ _numRounds, "-width", "" + _battleFieldWidth, "-height", "" + _battleFieldHeight, "-path", enginePath));
 			if(_roundSignals) {
-				command.add("-rounds");
+				command.add("-srounds");
 			}
 
 			System.out.print("Initializing engine: " + enginePath + "... ");
@@ -239,9 +239,10 @@ public class BattleRunner {
 			_callbackPool.submit(new Runnable() {
 				@Override
 				public void run() {
-					_listener.processResults(_id,getRobotScoreList(result), System.nanoTime() - startTime);
+					_listener.processResults(_id, getRobotScoreList(result), System.nanoTime() - startTime);
 				}
 			}).get();
+			
 			return result;
 		}
 	}
