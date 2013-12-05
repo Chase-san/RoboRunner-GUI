@@ -159,7 +159,7 @@ public class RoboRunner {
 			copyBots(_config.botsDirs);
 			if (!isMissingBots()) {
 				_battleRunner = new BattleRunner(_config.robocodePaths, _config.jvmArgs, _config.challenge.rounds,
-						_config.challenge.battleFieldWidth, _config.challenge.battleFieldHeight);
+						_config.challenge.battleFieldWidth, _config.challenge.battleFieldHeight,false);
 			}
 		}
 	}

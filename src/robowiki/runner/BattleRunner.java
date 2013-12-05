@@ -29,11 +29,15 @@ public class BattleRunner {
 	private int _numRounds;
 	private int _battleFieldWidth;
 	private int _battleFieldHeight;
+	private boolean _roundSignals;
 
-	public BattleRunner(Set<String> robocodeEnginePaths, String jvmArgs, int numRounds, int battleFieldWidth, int battleFieldHeight) {
+	public BattleRunner(Set<String> robocodeEnginePaths, String jvmArgs, int numRounds, int battleFieldWidth, int battleFieldHeight,
+			boolean requestRoundSignals) {
 		_numRounds = numRounds;
 		_battleFieldWidth = battleFieldWidth;
 		_battleFieldHeight = battleFieldHeight;
+		
+		_roundSignals = requestRoundSignals;
 
 		_threadPool = Executors.newFixedThreadPool(robocodeEnginePaths.size(), new BattleThreadFactory());
 		_callbackPool = Executors.newFixedThreadPool(1);
@@ -50,6 +54,9 @@ public class BattleRunner {
 			command.addAll(Lists.newArrayList(jvmArgs.trim().split(" +")));
 			command.addAll(Lists.newArrayList("-cp", System.getProperty("java.class.path"), "robowiki.runner.BattleProcess", "-rounds", ""
 					+ _numRounds, "-width", "" + _battleFieldWidth, "-height", "" + _battleFieldHeight, "-path", enginePath));
+			if(_roundSignals) {
+				command.add("-rounds");
+			}
 
 			System.out.print("Initializing engine: " + enginePath + "... ");
 			ProcessBuilder builder = new ProcessBuilder(command);
@@ -215,14 +222,13 @@ public class BattleRunner {
 			do {
 				// TODO: How to handle other output, errors etc?
 				input = reader.readLine();
-				if(isRoundSignal(input)) {
+				if(_roundSignals && isRoundSignal(input)) {
 					final int round = Integer.parseInt(input.substring(BattleProcess.ROUND_SIGNAL.length()));
 					_callbackPool.submit(new Runnable() {
 						@Override
 						public void run() {
 							//TODO check if the callback pool runs quick enough to allow this, otherwise...
 							_listener.processRound(_id, round);
-							
 						}
 					});
 				}
