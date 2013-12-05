@@ -244,7 +244,6 @@ public class BattleRunner {
 			do {
 				// TODO: How to handle other output, errors etc?
 				input = reader.readLine();
-				System.out.println(input);
 				if(_roundSignals && isRoundSignal(input)) {
 					final int round = Integer.parseInt(input.substring(BattleProcess.ROUND_SIGNAL.length()));
 					_callbackPool.submit(new Runnable() {
