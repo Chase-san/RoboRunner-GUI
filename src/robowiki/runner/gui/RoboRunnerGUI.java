@@ -3,8 +3,10 @@ package robowiki.runner.gui;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.DefaultListModel;
 import javax.swing.JScrollPane;
 import javax.swing.JList;
+import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.JButton;
 import javax.swing.UIManager;
@@ -17,20 +19,11 @@ import javax.swing.SpinnerNumberModel;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
-import java.util.Iterator;
-import java.util.Properties;
 
 import javax.swing.SwingConstants;
-
-import com.google.common.base.Splitter;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.ListSelectionEvent;
 
 public class RoboRunnerGUI extends JFrame {
 	private static final long serialVersionUID = 7337717745952162130L;
@@ -45,10 +38,19 @@ public class RoboRunnerGUI extends JFrame {
 	}
 	
 	private JList threadList;
-	private JList challengeList;
+	private JList<QueueItem> queueList;
+	private JButton btnRemove;
+	private JButton btnConfigure;
+	private JButton btnResults;
+	private JButton btnMoveUp;
+	private JButton btnMoveDown;
 	private JButton btnStart;
 	private JButton btnStop;
 	private JSpinner spnThreadCount;
+	private AddDialog addDialog;
+
+	private DefaultListModel<QueueItem> queue;
+	
 	public RoboRunnerGUI() {
 		setTitle("RoboRunner GUI");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -62,13 +64,49 @@ public class RoboRunnerGUI extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		contentPane.setLayout(new MigLayout("insets 0,gap 5", "[grow][]", "[grow][growprio 50,grow]"));
 		
-		JScrollPane challengeScrollPane = new JScrollPane();
-		challengeScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		challengeScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		contentPane.add(challengeScrollPane, "cell 0 0,grow");
+		JScrollPane queueScrollPane = new JScrollPane();
+		queueScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		queueScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		contentPane.add(queueScrollPane, "cell 0 0,grow");
 		
-		challengeList = new JList();
-		challengeScrollPane.setViewportView(challengeList);
+		queueList = new JList<QueueItem>(queue = new DefaultListModel<QueueItem>());
+		queueList.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
+		queueList.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
+				int[] indices = queueList.getSelectedIndices();
+				if(indices.length > 0) {
+					int first = indices[0];
+					int last = indices[indices.length - 1];
+					if(first != -1) {
+						if (first > 0) {
+							// enable up
+							btnMoveUp.setEnabled(true);
+						} else {
+							btnMoveUp.setEnabled(false);
+						}
+						if (last < queue.size() - 1) {
+							// enable down
+							btnMoveDown.setEnabled(true);
+						} else {
+							btnMoveDown.setEnabled(false);
+						}
+						
+						btnRemove.setEnabled(true);
+						btnConfigure.setEnabled(true);
+						btnResults.setEnabled(true);
+						return;
+					}
+				}
+				
+				//disable everything
+				btnConfigure.setEnabled(false);
+				btnMoveUp.setEnabled(false);
+				btnMoveDown.setEnabled(false);
+				btnRemove.setEnabled(false);
+				btnResults.setEnabled(false);
+			}
+		});
+		queueScrollPane.setViewportView(queueList);
 		
 		{
 			JPanel buttonPanel = new JPanel();
@@ -84,27 +122,77 @@ public class RoboRunnerGUI extends JFrame {
 			btnAdd.setFocusable(false);
 			buttonPanel.add(btnAdd);
 			
-			JButton btnRemove = new JButton("Remove");
+			btnRemove = new JButton("Remove");
+			btnRemove.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					
+					int[] selected = queueList.getSelectedIndices();
+					//do it backwards, otherwise the indexes will change.
+					for(int i = selected.length - 1; i >= 0; --i) {
+						queue.remove(selected[i]);
+					}
+					
+					queueList.revalidate();
+				}
+			});
 			btnRemove.setFocusable(false);
 			btnRemove.setEnabled(false);
 			buttonPanel.add(btnRemove);
 			
-			JButton btnConfigure = new JButton("Configure");
+			btnConfigure = new JButton("Configure");
+			btnConfigure.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					showConfigDialog();
+				}
+			});
 			btnConfigure.setFocusable(false);
 			btnConfigure.setEnabled(false);
 			buttonPanel.add(btnConfigure);
 			
-			JButton btnResults = new JButton("Results");
+			btnResults = new JButton("Results");
 			btnResults.setFocusable(false);
 			btnResults.setEnabled(false);
 			buttonPanel.add(btnResults);
 			
-			JButton btnMoveUp = new JButton("Move Up");
+			btnMoveUp = new JButton("Move Up");
+			btnMoveUp.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					int[] indices = queueList.getSelectedIndices();
+					
+					//start from the top
+					for(int i = 0; i < indices.length; ++i) {
+						QueueItem item = queue.get(indices[i]);
+						queue.removeElementAt(indices[i]);
+						queue.insertElementAt(item, --indices[i]);
+					}
+					
+					queueList.setSelectedIndices(indices);
+					
+					queueList.revalidate();
+					
+				}
+			});
 			btnMoveUp.setFocusable(false);
 			btnMoveUp.setEnabled(false);
 			buttonPanel.add(btnMoveUp);
 			
-			JButton btnMoveDown = new JButton("Move Down");
+			btnMoveDown = new JButton("Move Down");
+			btnMoveDown.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					int[] indices = queueList.getSelectedIndices();
+					
+					//start from the bottom
+					for(int i = indices.length - 1; i >= 0; --i) {
+						QueueItem item = queue.get(indices[i]);
+						queue.removeElementAt(indices[i]);
+						queue.insertElementAt(item, ++indices[i]);
+					}
+					
+					queueList.setSelectedIndices(indices);
+					
+					queueList.revalidate();
+				}
+			});
 			btnMoveDown.setFocusable(false);
 			btnMoveDown.setEnabled(false);
 			buttonPanel.add(btnMoveDown);
@@ -157,13 +245,19 @@ public class RoboRunnerGUI extends JFrame {
 		return contentPane;
 	}
 	
-	private AddDialog addDialog;
 	public void showAddDialog() {
 		if(addDialog == null) {
-			addDialog = new AddDialog(this);
+			addDialog = new AddDialog(this,queue);
+			//queueList.getModel();
 		}
 		addDialog.setLocationRelativeTo(this);
 		addDialog.setVisible(true);
+	}
+	
+	public void showConfigDialog() {
+		for(QueueItem item : queueList.getSelectedValuesList()) {
+			new ConfigureDialog(this,item).setVisible(true);
+		}
 	}
 	
 	public void startRunner() {

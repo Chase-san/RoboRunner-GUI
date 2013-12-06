@@ -341,7 +341,7 @@ public class RoboRunner {
 		return getBattleList(scoreLog, challenge, challenger, _config.seasons);
 	}
 
-	private List<BotList> getBattleList(ScoreLog scoreLog, ChallengeConfig challenge, String challenger, int seasons) {
+	public static List<BotList> getBattleList(ScoreLog scoreLog, ChallengeConfig challenge, String challenger, int seasons) {
 		Map<String, Integer> skipMap = getSkipMap(scoreLog);
 		List<BotList> battleList = Lists.newArrayList();
 		for (int x = 0; x < seasons; x++) {
@@ -357,7 +357,7 @@ public class RoboRunner {
 		return ImmutableList.copyOf(battleList);
 	}
 
-	private Map<String, Integer> getSkipMap(ScoreLog scoreLog) {
+	public static Map<String, Integer> getSkipMap(ScoreLog scoreLog) {
 		Map<String, Integer> skipMap = Maps.newHashMap();
 		for (String botList : scoreLog.getBotLists()) {
 			int numBattles = scoreLog.getBattleScores(botList).size();
@@ -366,7 +366,7 @@ public class RoboRunner {
 		return skipMap;
 	}
 
-	private boolean skip(Map<String, Integer> skipMap, String sortedBotList) {
+	public static boolean skip(Map<String, Integer> skipMap, String sortedBotList) {
 		if (skipMap.containsKey(sortedBotList)) {
 			int skipsLeft = skipMap.get(sortedBotList);
 			if (skipsLeft > 0) {

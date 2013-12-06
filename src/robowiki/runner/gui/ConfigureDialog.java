@@ -22,8 +22,11 @@ import javax.swing.BoxLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.List;
 
 import javax.swing.SpinnerNumberModel;
+
+import com.google.common.base.Splitter;
 
 /**
  * 
@@ -40,14 +43,21 @@ public class ConfigureDialog extends JDialog {
 	private String robotAlias;
 	private String challengeName;
 	private JSpinner spnSeasons;
+	
+	private QueueItem queueItem;
 
-	public ConfigureDialog(Window parent) {
+	public ConfigureDialog(Window parent, QueueItem item) {
 		super(parent);
+		queueItem = item;
 		setTitle("Configure: " + challengeName);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		createDialog();
 		setSize(320, 140);
 		setLocationRelativeTo(parent);
+		
+		challengeName = item.getChallenge().name;
+		List<String> robotTextParts = Splitter.on(' ').splitToList(item.getChallenger());
+		robotAlias = robotTextParts.get(0).substring(robotTextParts.get(0).indexOf('.')+1) + " " + robotTextParts.get(1);
 	}
 	
 	/**
@@ -66,7 +76,7 @@ public class ConfigureDialog extends JDialog {
 			txtTitle = new JTextField();
 			contentPanel.add(txtTitle, "cell 1 0,growx");
 			txtTitle.setColumns(10);
-			//TODO txtTitle.setText(spec.getTitle());
+			txtTitle.setText(queueItem.getTitle());
 		}
 		{
 			JLabel lblSeasons = new JLabel("Seasons");
@@ -75,7 +85,7 @@ public class ConfigureDialog extends JDialog {
 		{
 			spnSeasons = new JSpinner();
 			spnSeasons.setModel(new SpinnerNumberModel(new Integer(1), new Integer(1), null, new Integer(1)));
-			//TODO spnSeasons.setValue(spec.getSeasons());
+			spnSeasons.setValue(queueItem.getSeasons());
 			contentPanel.add(spnSeasons, "cell 1 1,growx");
 		}
 		{
@@ -129,7 +139,9 @@ public class ConfigureDialog extends JDialog {
 	}
 	
 	private void saveConfiguration() {
-		//TODO save configuration
+		queueItem.setTitle(txtTitle.getText());
+		queueItem.setSeasons((int)spnSeasons.getValue());
+		queueItem.updateBattleList();
 	}
 	
 	private void resetTitle() {

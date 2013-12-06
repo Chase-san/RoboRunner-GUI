@@ -14,6 +14,7 @@ import javax.swing.filechooser.FileFilter;
 
 import net.miginfocom.swing.MigLayout;
 
+import javax.swing.DefaultListModel;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -24,14 +25,17 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import javax.swing.SpinnerNumberModel;
 
+import robowiki.runner.ChallengeConfig;
+
 import com.google.common.base.Charsets;
+import com.google.common.base.Splitter;
 import com.google.common.io.Files;
 
 import chase.EndsWithFileFilter;
-import chase.Strings;
 import chase.WindowToolkit;
 
 /**
@@ -43,17 +47,20 @@ public class AddDialog extends JDialog {
 	private final JPanel contentPanel = new JPanel();
 	private JFileChooser rrcChooser = null;
 	private JFileChooser botChooser = null;
-	
 	private JTextField txtChallenge;
 	private JTextField txtRobot;
 	private JTextField txtTitle;
 	private JCheckBox chckbxAuto;
 	private JSpinner spnSeasons;
 	
+	private DefaultListModel<QueueItem> queue;
+	
 	private String challengeName = "";
 
-	public AddDialog(Window parent) {
+	public AddDialog(Window parent, DefaultListModel<QueueItem> model) {
 		super(parent, "Add Challenge");
+		queue = model;
+		
 		setModal(true);
 		createDialog();
 		setSize(330, 200);
@@ -187,10 +194,12 @@ public class AddDialog extends JDialog {
 		if(chckbxAuto.isSelected()) {
 			String robotAlias = "";
 			if(txtRobot.getText().indexOf(' ') != -1) {
-				String[] robotTextParts = Strings.split(txtRobot.getText(), ' ');
-				if(robotTextParts.length > 1)
-					robotAlias = robotTextParts[0].substring(
-							robotTextParts[0].indexOf('.')+1) + " " + robotTextParts[1];
+				List<String> robotTextParts = Splitter.on(' ')
+						.splitToList(txtRobot.getText());
+				if(robotTextParts.size() > 1)
+					robotAlias = robotTextParts.get(0).substring(
+							robotTextParts.get(0).indexOf('.')+1) +
+							" " + robotTextParts.get(1);
 			}
 			
 			txtTitle.setText(robotAlias + " - " + challengeName);
@@ -245,6 +254,12 @@ public class AddDialog extends JDialog {
 	}
 	
 	private void addChallenge() {
-		//TODO add challenge to queue
+		QueueItem item = new QueueItem(
+				ChallengeConfig.load(txtChallenge.getText()),
+				txtRobot.getText(),
+				(int)spnSeasons.getValue()
+			);
+		item.setTitle(txtTitle.getText());
+		queue.addElement(item);
 	}
 }
