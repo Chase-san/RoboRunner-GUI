@@ -23,6 +23,8 @@ import java.awt.GridLayout;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionListener;
@@ -274,25 +276,35 @@ public class RoboRunnerGUI extends JFrame {
 	}
 	
 	private BattleRunner runner;
-	
+	private ExecutorService service;
 	public void startRunner() {
+		
 		//disable start/thread # and enable stop
 		btnStop.setEnabled(true);
 		btnStart.setEnabled(false);
 		spnThreadCount.setEnabled(false);
 		
-		int threadCount = (int)spnThreadCount.getValue();
+		final int threadCount = (int)spnThreadCount.getValue();
 		
-		HashSet<String> paths = new HashSet<String>();
-		for(int i = 0; i < threadCount; ++i)
-			paths.add("robocodes/r" + i);
-		
-		runner = new BattleRunner(paths,"-Xmx512M",true);
-		
-		for(int i = 0; i < threadCount; ++i) {
-			ThreadController control = new ThreadController();
-			control.startNextBattle();
+		if(service == null) {
+			service = Executors.newFixedThreadPool(1);
 		}
+		
+		service.execute(new Runnable() {
+			@Override
+			public void run() {
+				HashSet<String> paths = new HashSet<String>();
+				for(int i = 0; i < threadCount; ++i)
+					paths.add("robocodes/r" + i);
+				
+				runner = new BattleRunner(paths,"-Xmx512M",true);
+				
+				for(int i = 0; i < threadCount; ++i) {
+					ThreadController control = new ThreadController();
+					control.startNextBattle();
+				}
+			}
+		});
 	}
 	
 	public void stopRunner() {
@@ -305,6 +317,9 @@ public class RoboRunnerGUI extends JFrame {
 			runner.shutdown();
 			runner = null;
 		}
+		
+		threads.removeAllElements();
+		threadList.revalidate();
 	}
 	
 	public void dispose() {
