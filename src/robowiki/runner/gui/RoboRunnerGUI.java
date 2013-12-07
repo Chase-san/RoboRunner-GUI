@@ -150,6 +150,11 @@ public class RoboRunnerGUI extends JFrame {
 			buttonPanel.add(btnConfigure);
 			
 			btnResults = new JButton("Results");
+			btnResults.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					showResultsDialog();
+				}
+			});
 			btnResults.setFocusable(false);
 			btnResults.setEnabled(false);
 			buttonPanel.add(btnResults);
@@ -257,6 +262,12 @@ public class RoboRunnerGUI extends JFrame {
 	public void showConfigDialog() {
 		for(QueueItem item : queueList.getSelectedValuesList()) {
 			new ConfigureDialog(this,item).setVisible(true);
+		}
+	}
+	
+	public void showResultsDialog() {
+		for(QueueItem item : queueList.getSelectedValuesList()) {
+			new ResultsDialog(this,item).setVisible(true);
 		}
 	}
 	

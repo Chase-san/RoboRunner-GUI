@@ -55,8 +55,8 @@ public class ConfigureDialog extends JDialog {
 		setSize(320, 140);
 		setLocationRelativeTo(parent);
 		
-		challengeName = item.getChallenge().name;
-		List<String> robotTextParts = Splitter.on(' ').splitToList(item.getChallenger());
+		challengeName = item.challenge.name;
+		List<String> robotTextParts = Splitter.on(' ').splitToList(item.challenger);
 		robotAlias = robotTextParts.get(0).substring(robotTextParts.get(0).indexOf('.')+1) + " " + robotTextParts.get(1);
 	}
 	

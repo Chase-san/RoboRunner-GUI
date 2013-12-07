@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -91,6 +93,12 @@ public class ScoreLog {
 			_botLists.add(botListString);
 		}
 		_scores.get(botListString).add(new BattleScore(robotScores, numRounds, elapsedTime));
+	}
+	
+	public String getSortedBotListFromBotList(BotList botList) {
+		List<String> list = Lists.newArrayList(botList.getBotNames());
+		list.remove(challenger);
+		return getSortedBotList(list);
 	}
 
 	public String getSortedBotListFromScores(List<RobotScore> robotScores) {

@@ -545,7 +545,7 @@ public class RoboRunner {
 		return overallTotal / numGroupScores;
 	}
 
-	private ScoreSummary getScoreSummary(ScoreLog scoreLog, List<BotList> referenceBots, ScoringStyle scoringStyle) {
+	public static ScoreSummary getScoreSummary(ScoreLog scoreLog, List<BotList> referenceBots, ScoringStyle scoringStyle) {
 		double sumScores = 0;
 		int numBattles = 0;
 		int scoredBotLists = 0;
@@ -561,7 +561,7 @@ public class RoboRunner {
 		return new ScoreSummary(sumScores, numBattles, scoredBotLists);
 	}
 
-	private double getWikiScore(ScoreLog scoreLog, BotList botList, ScoringStyle scoringStyle) {
+	public static double getWikiScore(ScoreLog scoreLog, BotList botList, ScoringStyle scoringStyle) {
 		String botListString = scoreLog.getSortedBotList(botList.getBotNames());
 		double score = -1;
 		if (scoreLog.hasBotList(botListString)) {
@@ -759,7 +759,7 @@ public class RoboRunner {
 		}
 	}
 
-	private static class ScoreSummary {
+	public static class ScoreSummary {
 		public final double sumScores;
 		public final int numBattles;
 		public final int scoredBotLists;

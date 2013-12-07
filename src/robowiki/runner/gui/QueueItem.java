@@ -10,9 +10,9 @@ import robowiki.runner.ScoreLog;
 public class QueueItem {
 	private String title;
 	private List<BotList> battleList;
-	private ChallengeConfig challenge;
-	private ScoreLog scoreLog;
-	private String challenger;
+	public final ChallengeConfig challenge;
+	public final ScoreLog scoreLog;
+	public final String challenger;
 	private int seasons;
 	
 	public QueueItem(ChallengeConfig challenge, String challenger, int seasons) {
@@ -41,18 +41,6 @@ public class QueueItem {
 
 	public List<BotList> getBattleList() {
 		return battleList;
-	}
-
-	public ChallengeConfig getChallenge() {
-		return challenge;
-	}
-
-	public ScoreLog getScoreLog() {
-		return scoreLog;
-	}
-
-	public String getChallenger() {
-		return challenger;
 	}
 
 	public int getSeasons() {
