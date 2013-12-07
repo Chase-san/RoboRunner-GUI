@@ -242,15 +242,20 @@ public class BattleRunner {
 			do {
 				// TODO: How to handle other output, errors etc?
 				input = reader.readLine();
-				if(_roundSignals && isRoundSignal(input)) {
-					final int round = Integer.parseInt(input.substring(BattleProcess.ROUND_SIGNAL.length()));
-					_callbackPool.execute(new Runnable() {
-						@Override
-						public void run() {
-							//TODO check if the callback pool runs quick enough to allow this, otherwise...
-							_listener.processRound(id, round);
-						}
-					});
+				if(isRoundSignal(input)) {
+					if(_roundSignals) {
+						final int round = Integer.parseInt(input.substring(BattleProcess.ROUND_SIGNAL.length()));
+						_callbackPool.execute(new Runnable() {
+							@Override
+							public void run() {
+								//TODO check if the callback pool runs quick enough to allow this, otherwise...
+								_listener.processRound(id, round);
+							}
+						});
+					}
+				} else {
+					//Temporary debugging
+					System.out.println(input);
 				}
 			} while (!isBattleResult(input));
 			
