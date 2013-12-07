@@ -30,6 +30,7 @@ import java.util.List;
 import javax.swing.SpinnerNumberModel;
 
 import robowiki.runner.ChallengeConfig;
+import robowiki.runner.RunnerUtil;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
@@ -192,15 +193,7 @@ public class AddDialog extends JDialog {
 	
 	private void updateTitle() {
 		if(chckbxAuto.isSelected()) {
-			String robotAlias = "";
-			if(txtRobot.getText().indexOf(' ') != -1) {
-				List<String> robotTextParts = Splitter.on(' ')
-						.splitToList(txtRobot.getText());
-				if(robotTextParts.size() > 1)
-					robotAlias = robotTextParts.get(0).substring(
-							robotTextParts.get(0).indexOf('.')+1) +
-							" " + robotTextParts.get(1);
-			}
+			String robotAlias = RunnerUtil.getRobotAlias(txtRobot.getText());
 			
 			txtTitle.setText(robotAlias + " - " + challengeName);
 		}
@@ -209,7 +202,7 @@ public class AddDialog extends JDialog {
 	private void browseForChallenge() {
 		if(rrcChooser == null) {
 			//TODO move this definition elsewhere
-			String directory = "scripts";
+			String directory = "challenges";
 			new File(directory).mkdirs();
 			WindowToolkit.setFileChooserReadOnly(true);
 			rrcChooser = new JFileChooser(directory);
@@ -234,7 +227,7 @@ public class AddDialog extends JDialog {
 	private void browseForRobot() {
 		if(botChooser == null) {
 			//TODO move this definition elsewhere
-			String directory = "bots";
+			String directory = "robots";
 			new File(directory).mkdirs();
 			WindowToolkit.setFileChooserReadOnly(true);
 			botChooser = new JFileChooser(directory);

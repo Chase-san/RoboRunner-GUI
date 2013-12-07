@@ -18,6 +18,7 @@ import robowiki.runner.BotList;
 import robowiki.runner.ChallengeConfig.BotListGroup;
 import robowiki.runner.RoboRunner.ScoreSummary;
 import robowiki.runner.RoboRunner;
+import robowiki.runner.RunnerUtil;
 import robowiki.runner.ScoreLog;
 
 public class ResultsDialog extends JDialog {
@@ -36,6 +37,7 @@ public class ResultsDialog extends JDialog {
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setSize(620, 120);
 		setLocationRelativeTo(parent);
+		setTitle(queueItem.getTitle() + ":: " + queueItem.challenge.name);
 	}
 	
 	private JPanel getContentPanel() {
@@ -66,33 +68,34 @@ public class ResultsDialog extends JDialog {
 		//get column names
 		ArrayList<String> columns = new ArrayList<String>();
 		ArrayList<Object> data = new ArrayList<Object>();
-		data.add(item.challenger);
+		
 		ScoreLog log = item.scoreLog;
 		
 		columns.add("Challenger");
+		data.add(RunnerUtil.getRobotAlias(item.challenger));
+		
 		//setup groups and such
 		int index = 0;
-		int groupSum = 0;
+		double groupSum = 0;
 		for(BotListGroup group : item.challenge.referenceBotGroups) {
 			for(BotList list : group.referenceBots) {
 				//it's a list of bots... but for now treat it as just one robot.
-				columns.add(list.getBotNames().get(0));
+				columns.add(RunnerUtil.getRobotAlias(list.getBotNames().get(0)));
 				
 				double score = RoboRunner.getWikiScore(log, list, item.challenge.scoringStyle);
 				data.add(score);
 			}
 			
+			columns.add("Sub " + ++index);
 			ScoreSummary summary = RoboRunner.getScoreSummary(log, group.referenceBots, item.challenge.scoringStyle);
-			
 			data.add(summary.getTotalScore());
 			
 			groupSum += summary.getTotalScore();
-			
-			columns.add("Sub " + ++index);
 		}
 		
 		columns.add("Total");
-		data.add(groupSum / item.challenge.referenceBotGroups.size());
+		groupSum = round(groupSum / item.challenge.referenceBotGroups.size(), 2);
+		data.add(groupSum);
 		
 		columns.add("Ssns");
 		ScoreSummary summary = RoboRunner.getScoreSummary(log, item.challenge.allReferenceBots, item.challenge.scoringStyle);

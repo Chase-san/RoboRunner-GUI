@@ -1,6 +1,9 @@
 package robowiki.runner.gui;
 
+import java.util.Collections;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import robowiki.runner.BotList;
 import robowiki.runner.ChallengeConfig;
@@ -24,7 +27,7 @@ public class QueueItem {
 	}
 	
 	protected void updateBattleList() {
-		this.battleList = RoboRunner.getBattleList(scoreLog, challenge, challenger, seasons);
+		this.battleList = Collections.synchronizedList(Lists.newArrayList(RoboRunner.getBattleList(scoreLog, challenge, challenger, seasons)));
 	}
 	
 	public String getTitle() {

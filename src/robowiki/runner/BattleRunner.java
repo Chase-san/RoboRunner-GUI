@@ -63,6 +63,13 @@ public class BattleRunner {
 			e.printStackTrace();
 		}
 	}
+	
+	public void runBattlesNonBlocking(List<BotList> botLists, BattleOutputHandler handler,
+			int numRounds, int battlefieldWidth, int battlefieldHeight) {
+		for (final BotList botList : botLists) {
+			_threadPool.submit(new BattleCallable(botList, handler, numRounds, battlefieldWidth, battlefieldHeight));
+		}
+	}
 
 	public void runBattles(List<BotList> botLists, BattleOutputHandler handler,
 			int numRounds, int battlefieldWidth, int battlefieldHeight) {
@@ -150,7 +157,9 @@ public class BattleRunner {
 		int _counter = 0;
 		@Override
 		public Thread newThread(Runnable r) {
-			return new Thread(r,""+_counter++);
+			Thread thread = new Thread(r,""+_counter++);
+			thread.setDaemon(true);
+			return thread;
 		}
 	}
 
@@ -165,7 +174,6 @@ public class BattleRunner {
 		private BotList _botList;
 		private BattleSelector _selector;
 		private BattleOutputHandler _listener;
-		private int _id = 0;
 
 		public BattleCallable(BotList botList, BattleOutputHandler listener,
 				int numRounds, int battlefieldWidth, int battlefieldHeight) {
@@ -207,21 +215,11 @@ public class BattleRunner {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(battleProcess.getInputStream()));
 			final BotList botList;
 			
-			_id = Integer.parseInt(Thread.currentThread().getName());
+			final int id = Integer.parseInt(Thread.currentThread().getName());
 			
 			if (_selector == null) {
 				botList = _botList;
-			} else { 
-				//why does this need to run through the callback pool?
-				/*
-				botList = _callbackPool.submit(new Callable<BotList>() {
-					@Override
-					public BotList call() throws Exception {
-						return _selector.nextBotList();
-					}
-				}).get();
-				*/
-				
+			} else {
 				//Until I can figure out a better way to do it.
 				_numRounds = _selector.nextNumRounds();
 				_battlefieldWidth = _selector.nextBattlefieldWidth();
@@ -229,10 +227,10 @@ public class BattleRunner {
 				botList = _selector.nextBotList();
 			}
 			
-			_callbackPool.submit(new Runnable() {
+			_callbackPool.execute(new Runnable() {
 				@Override
 				public void run() {
-					_listener.processNewBattle(_id, botList);
+					_listener.processNewBattle(id, botList);
 				}
 			});
 
@@ -246,11 +244,11 @@ public class BattleRunner {
 				input = reader.readLine();
 				if(_roundSignals && isRoundSignal(input)) {
 					final int round = Integer.parseInt(input.substring(BattleProcess.ROUND_SIGNAL.length()));
-					_callbackPool.submit(new Runnable() {
+					_callbackPool.execute(new Runnable() {
 						@Override
 						public void run() {
 							//TODO check if the callback pool runs quick enough to allow this, otherwise...
-							_listener.processRound(_id, round);
+							_listener.processRound(id, round);
 						}
 					});
 				}
@@ -258,12 +256,12 @@ public class BattleRunner {
 			
 			final String result = input;
 			_processQueue.add(battleProcess);
-			_callbackPool.submit(new Runnable() {
+			_callbackPool.execute(new Runnable() {
 				@Override
 				public void run() {
-					_listener.processResults(_id, getRobotScoreList(result), System.nanoTime() - startTime);
+					_listener.processResults(id, getRobotScoreList(result), System.nanoTime() - startTime);
 				}
-			}).get();
+			});
 			
 			return result;
 		}

@@ -2,6 +2,7 @@ package robowiki.runner;
 
 import java.util.List;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
 /**
@@ -111,5 +112,18 @@ public class RunnerUtil {
 			sum += value;
 		}
 		return (sum / values.size());
+	}
+	
+	public static String getRobotAlias(String fullname) {
+		if(fullname.indexOf(' ') != -1) {
+			List<String> robotTextParts = Splitter.on(' ')
+					.splitToList(fullname);
+			if(robotTextParts.size() > 1) {
+				return robotTextParts.get(0).substring(
+						robotTextParts.get(0).lastIndexOf('.')+1) +
+						" " + robotTextParts.get(1);
+			}
+		}
+		return fullname;
 	}
 }

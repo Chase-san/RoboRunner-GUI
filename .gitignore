@@ -4,5 +4,7 @@ bin/
 tmp/
 .classpath
 .settings/
-robocode/
+robocodes/
+robots/
+challenges/
 *.jar

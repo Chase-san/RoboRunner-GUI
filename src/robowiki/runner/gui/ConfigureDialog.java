@@ -22,11 +22,10 @@ import javax.swing.BoxLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.util.List;
 
 import javax.swing.SpinnerNumberModel;
 
-import com.google.common.base.Splitter;
+import robowiki.runner.RunnerUtil;
 
 /**
  * 
@@ -56,8 +55,7 @@ public class ConfigureDialog extends JDialog {
 		setLocationRelativeTo(parent);
 		
 		challengeName = item.challenge.name;
-		List<String> robotTextParts = Splitter.on(' ').splitToList(item.challenger);
-		robotAlias = robotTextParts.get(0).substring(robotTextParts.get(0).indexOf('.')+1) + " " + robotTextParts.get(1);
+		robotAlias = RunnerUtil.getRobotAlias(item.challenger);
 	}
 	
 	/**
