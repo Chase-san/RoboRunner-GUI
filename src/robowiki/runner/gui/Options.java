@@ -19,6 +19,7 @@ public class Options {
 	private static final String RUNNER_DIR_PROPERTY = "runnerDir";
 	private static final String CHALLENGES_DIR_PROPERTY = "challengeDir";
 	private static final String ROBOCODE_PATH_PROPERTY = "robocodeLibDir";
+	private static final String THREADS_PROPERTY = "threads";
 	
 	public static File robocodeLibDir = new File("/robocode/libs");
 	public static File challengeDir = new File("challenges");
@@ -40,6 +41,7 @@ public class Options {
 			runnerDir = new File(config.getProperty(RUNNER_DIR_PROPERTY,"robocodes"));
 			robotsDir = new File(config.getProperty(BOTS_DIR_PROPERTY,"robots"));
 			jvmArgs = config.getProperty(JVM_ARGS_PROPERTY,"-Xmx512M");
+			threads = Integer.parseInt(config.getProperty(THREADS_PROPERTY,"1"));
 		} catch (IOException e) {}
 	}
 	
@@ -51,6 +53,7 @@ public class Options {
 		config.setProperty(BOTS_DIR_PROPERTY,robotsDir.getPath());
 		config.setProperty(RUNNER_DIR_PROPERTY,runnerDir.getPath());
 		config.setProperty(JVM_ARGS_PROPERTY,jvmArgs);
+		config.setProperty(THREADS_PROPERTY,""+threads);
 		
 		try {
 			FileOutputStream fos = new FileOutputStream("config");

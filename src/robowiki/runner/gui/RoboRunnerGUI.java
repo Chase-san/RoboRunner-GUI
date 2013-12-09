@@ -406,6 +406,8 @@ public class RoboRunnerGUI extends JFrame {
 		final int threadCount = (int) spnThreadCount.getValue();
 		
 		Options.createRunners(threadCount);
+		
+		Options.saveOptions();
 
 		if (service == null) {
 			service = Executors.newFixedThreadPool(1);
