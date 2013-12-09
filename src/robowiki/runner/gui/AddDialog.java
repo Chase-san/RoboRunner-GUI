@@ -25,7 +25,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
 
 import javax.swing.SpinnerNumberModel;
 
@@ -33,7 +32,6 @@ import robowiki.runner.ChallengeConfig;
 import robowiki.runner.RunnerUtil;
 
 import com.google.common.base.Charsets;
-import com.google.common.base.Splitter;
 import com.google.common.io.Files;
 
 import chase.EndsWithFileFilter;
@@ -201,15 +199,15 @@ public class AddDialog extends JDialog {
 	
 	private void browseForChallenge() {
 		if(rrcChooser == null) {
-			//TODO move this definition elsewhere
-			String directory = "challenges";
-			new File(directory).mkdirs();
+			Options.challengeDir.mkdirs();
 			WindowToolkit.setFileChooserReadOnly(true);
-			rrcChooser = new JFileChooser(directory);
+			rrcChooser = new JFileChooser();
 			FileFilter filter = new EndsWithFileFilter(".rrc", "Challenge Files");
 			rrcChooser.addChoosableFileFilter(filter);
 			rrcChooser.setFileFilter(filter);
 		}
+		//reset the directory to the one in options
+		rrcChooser.setCurrentDirectory(Options.challengeDir);
 		if(rrcChooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
 			return;
 		}
@@ -226,15 +224,15 @@ public class AddDialog extends JDialog {
 
 	private void browseForRobot() {
 		if(botChooser == null) {
-			//TODO move this definition elsewhere
-			String directory = "robots";
-			new File(directory).mkdirs();
+			Options.robotsDir.mkdirs();
 			WindowToolkit.setFileChooserReadOnly(true);
-			botChooser = new JFileChooser(directory);
+			botChooser = new JFileChooser();
 			FileFilter filter = new EndsWithFileFilter(".jar", "Java Archive");
 			botChooser.addChoosableFileFilter(filter);
 			botChooser.setFileFilter(filter);
 		}
+		//reset the directory to the one in options
+		botChooser.setCurrentDirectory(Options.robotsDir);
 		if(botChooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
 			return;
 		}
