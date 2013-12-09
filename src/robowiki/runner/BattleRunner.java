@@ -56,7 +56,7 @@ public class BattleRunner {
 			String processOutput;
 			do {
 				processOutput = reader.readLine();
-			} while (!processOutput.equals(BattleProcess.READY_SIGNAL));
+			} while (!BattleProcess.READY_SIGNAL.equals(processOutput));
 			System.out.println("done!");
 			_processQueue.add(battleProcess);
 		} catch (IOException e) {
