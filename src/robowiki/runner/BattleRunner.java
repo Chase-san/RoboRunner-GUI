@@ -47,15 +47,18 @@ public class BattleRunner {
 			if(_roundSignals) {
 				command.add("-srounds");
 			}
-
 			System.out.print("Initializing engine: " + enginePath + "... ");
 			ProcessBuilder builder = new ProcessBuilder(command);
 			builder.redirectErrorStream(true);
 			Process battleProcess = builder.start();
+			
 			BufferedReader reader = new BufferedReader(new InputStreamReader(battleProcess.getInputStream()));
 			String processOutput;
 			do {
 				processOutput = reader.readLine();
+				if(processOutput == null) {
+					throw new RuntimeException("BattleProcess failed to start.");
+				}
 			} while (!BattleProcess.READY_SIGNAL.equals(processOutput));
 			System.out.println("done!");
 			_processQueue.add(battleProcess);
