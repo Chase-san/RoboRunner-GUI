@@ -102,6 +102,12 @@ public class RoboRunnerGUI extends JFrame {
 					if (list.size() != 0) {
 						BotList botList = list.remove(0);
 						queueItem = item;
+						
+						//copy robots if needed
+						for(String bot : botList.getBotNames()) {
+							Options.copyRobotToRunners(bot);
+						}
+						
 						runner.runBattlesNonBlocking(Lists.newArrayList(botList), this, item.challenge.rounds,
 								item.challenge.battleFieldWidth, item.challenge.battleFieldHeight);
 						return;
@@ -134,7 +140,7 @@ public class RoboRunnerGUI extends JFrame {
 	private JMenuItem mntmOptions;
 
 	public RoboRunnerGUI() {
-		setTitle("RoboRunner GUI v0.9.0");
+		setTitle("RoboRunner GUI v0.9.2");
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
 		setJMenuBar(createMenuBar());
@@ -392,13 +398,14 @@ public class RoboRunnerGUI extends JFrame {
 	}
 
 	private void startRunner() {
-
 		// disable start/thread # and enable stop
 		btnStop.setEnabled(true);
 		btnStart.setEnabled(false);
 		spnThreadCount.setEnabled(false);
 
 		final int threadCount = (int) spnThreadCount.getValue();
+		
+		Options.createRunners(threadCount);
 
 		if (service == null) {
 			service = Executors.newFixedThreadPool(1);
