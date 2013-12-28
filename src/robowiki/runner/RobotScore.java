@@ -37,7 +37,7 @@ public class RobotScore {
 			return robotScore.bulletDamage;
 		}
 	};
-	public static final Function<RobotScore, Double> MOVEMENT_CHALLENGE_SCORER = new Function<RobotScore, Double>() {
+	public static final Function<RobotScore, Double> ENERGY_CONSERVED_SCORER = new Function<RobotScore, Double>() {
 		@Override
 		public Double apply(RobotScore robotScore) {
 			return robotScore.energyConserved;
@@ -145,7 +145,7 @@ public class RobotScore {
 		SURVIVAL_FIRSTS("Survival Firsts", SURVIVAL_FIRSTS_SCORER, false),
 		SURVIVAL_SCORE("Survival Score", SURVIVAL_SCORER, false),
 		BULLET_DAMAGE("Bullet Damage", BULLET_DAMAGE_SCORER, true),
-		MOVEMENT_CHALLENGE("Movement Challenge", MOVEMENT_CHALLENGE_SCORER, true);
+		ENERGY_CONSERVED("Energy Conserved", ENERGY_CONSERVED_SCORER, true);
 
 		private String _description;
 		private Function<RobotScore, Double> _scorer;
@@ -167,7 +167,7 @@ public class RobotScore {
 			} else if (styleString.contains("SURVIVAL_SCORE")) {
 				return SURVIVAL_SCORE;
 			} else if (styleString.contains("MOVEMENT_CHALLENGE") || styleString.contains("ENERGY_CONSERVED")) {
-				return MOVEMENT_CHALLENGE;
+				return ENERGY_CONSERVED;
 			} else {
 				throw new IllegalArgumentException("Unrecognized scoring style: " + styleString);
 			}

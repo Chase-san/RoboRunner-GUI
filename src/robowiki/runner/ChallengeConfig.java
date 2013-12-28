@@ -103,7 +103,7 @@ public class ChallengeConfig {
 				}
 			}
 
-			if (scoringStyle == ScoringStyle.MOVEMENT_CHALLENGE && maxBots > 2) {
+			if (scoringStyle == ScoringStyle.ENERGY_CONSERVED && maxBots > 2) {
 				throw new RuntimeException("Movement Challenge scoring doesn't work " + "for battles with more than 2 bots.");
 			}
 
