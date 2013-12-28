@@ -7,8 +7,7 @@ Installation overview:
     uses its own install.)
 
 WARNING: This is a ALPHA version of RoboRunner-GUI. This version does not
-	copy robots into the robocode installs! Nor does it save the queue,
-	results, thread number or anything else. Please report any bugs.
+	save the queue or battle results! Please report any bugs.
 	
 =Directories=
 robots/ is used for robots.

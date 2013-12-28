@@ -105,7 +105,7 @@ public class Options {
 			throw new RuntimeException("Robocode library directory does not exist!");
 		}
 		
-		//copy libs
+		//create robocode libraries
 		for(int i = 0; i < total; ++i) {
 			String directory = getRunnerDirectory(i);
 			File dir = new File(directory);
