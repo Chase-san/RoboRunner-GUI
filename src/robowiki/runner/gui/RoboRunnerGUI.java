@@ -138,6 +138,8 @@ public class RoboRunnerGUI extends JFrame {
 
 	private DefaultListModel<String> threads;
 	private JMenuItem mntmOptions;
+	private JMenu mnCreate;
+	private JMenuItem mntmChallenge;
 
 	public RoboRunnerGUI() {
 		setTitle("RoboRunner GUI v0.9.2");
@@ -343,6 +345,17 @@ public class RoboRunnerGUI extends JFrame {
 
 	private JMenuBar createMenuBar() {
 		JMenuBar menuBar = new JMenuBar();
+		
+		mnCreate = new JMenu("Create");
+		menuBar.add(mnCreate);
+		
+		mntmChallenge = new JMenuItem("Challenge");
+		mntmChallenge.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				showCreateChallengeDialog();
+			}
+		});
+		mnCreate.add(mntmChallenge);
 
 		JMenu mnSettings = new JMenu("View");
 		mnSettings.setMnemonic(KeyEvent.VK_V);
@@ -389,6 +402,11 @@ public class RoboRunnerGUI extends JFrame {
 	
 	private void showOptionsDialog() {
 		new OptionsDialog(this).setVisible(true);
+	}
+	
+	private void showCreateChallengeDialog() {
+		//TODO make this persistant
+		new CreateChallengeDialog(this).setVisible(true);
 	}
 
 	private void showResultsDialog() {
