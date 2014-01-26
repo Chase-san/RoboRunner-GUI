@@ -399,7 +399,7 @@ public class RoboRunner {
 		File dataFile = new File(filePath);
 		if (dataFile.exists()) {
 			try {
-				return ScoreLog.loadScoreLog(filePath);
+				return ScoreLog.loadXMLScoreLog(filePath);
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			} catch (XMLStreamException e) {

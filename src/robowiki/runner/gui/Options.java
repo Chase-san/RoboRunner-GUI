@@ -27,6 +27,7 @@ public class Options {
 	public static File runnerDir = null;
 	public static File robotsDir = null;
 	public static File dataDir = null;
+	public static File dataQueueDir = null;
 	public static String jvmArgs = "";
 	public static int threads = 0;
 	
@@ -44,6 +45,7 @@ public class Options {
 		runnerDir = new File(config.getProperty(RUNNER_DIR_PROPERTY,"robocodes"));
 		robotsDir = new File(config.getProperty(BOTS_DIR_PROPERTY,"robots"));
 		dataDir = new File(config.getProperty(DATA_DIR_PROPERTY,"data"));
+		dataQueueDir = new File(dataDir,"queue");
 		jvmArgs = config.getProperty(JVM_ARGS_PROPERTY,"-Xmx512M");
 		threads = Integer.parseInt(config.getProperty(THREADS_PROPERTY,"1"));
 	}
@@ -68,11 +70,13 @@ public class Options {
 	
 	public static String transformPath(File file) {
 		String root = new File(".").getAbsoluteFile().getParent();
-		root = root.replace('\\', '/');
+		//just so it is easy to read
+		root = root.replace(File.separatorChar, '/');
 		if(!root.endsWith("/"))
 			root += "/";
+		
 		String path = file.getAbsolutePath();
-		path = path.replace('\\', '/');
+		path = path.replace(File.separatorChar, '/');
 		
 		if(path.startsWith(root)) {
 			path = path.substring(root.length());

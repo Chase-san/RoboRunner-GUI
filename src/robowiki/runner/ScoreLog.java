@@ -183,7 +183,7 @@ public class ScoreLog {
 	 *             if the file doesn't exist
 	 * @throws IOException
 	 */
-	public static ScoreLog loadScoreLog(String inputFilePath) throws XMLStreamException, FileNotFoundException, IOException {
+	public static ScoreLog loadXMLScoreLog(String inputFilePath) throws XMLStreamException, FileNotFoundException, IOException {
 		ScoreLog scoreLog = null;
 		List<RobotScore> robotScores = null;
 		int numRounds = 0;

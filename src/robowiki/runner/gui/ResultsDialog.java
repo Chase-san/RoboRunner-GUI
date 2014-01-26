@@ -82,6 +82,7 @@ public class ResultsDialog extends JDialog {
 				//it's a list of bots... but for now treat it as just one robot.
 				columns.add(RunnerUtil.getRobotAlias(list.getBotNames().get(0)));
 				
+				//TODO handle different round counts
 				double score = RoboRunner.getWikiScore(log, list, item.challenge.scoringStyle);
 				data.add(score);
 			}

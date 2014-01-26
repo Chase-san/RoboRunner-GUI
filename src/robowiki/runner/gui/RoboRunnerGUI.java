@@ -43,7 +43,10 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
+
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
 
 public class RoboRunnerGUI extends JFrame {
 	private class ThreadController implements BattleOutputHandler {
@@ -142,11 +145,12 @@ public class RoboRunnerGUI extends JFrame {
 	private JMenuItem mntmChallenge;
 
 	public RoboRunnerGUI() {
-		setTitle("RoboRunner GUI v0.9.2");
+		setTitle("RoboRunner GUI v0.9.3");
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 
 		setJMenuBar(createMenuBar());
 		setContentPane(createContentPane());
+		loadQueue();
 		pack();
 		
 		setLocationByPlatform(true);
@@ -382,8 +386,48 @@ public class RoboRunnerGUI extends JFrame {
 			runner = null;
 		}
 		super.dispose();
+		
+		saveQueue();
+		
 		// Force an exit.
 		System.exit(0);
+	}
+	
+	private void saveQueue() {
+		//save the queue items.
+		if(!queue.isEmpty()) {
+			//create the data directory
+			Options.dataQueueDir.mkdirs();
+			
+			//create the queue items
+			try {
+				for(int i = 0; i < queue.getSize(); ++i) {
+					queue.get(i).save(i);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	private void loadQueue() {
+		int n = 0;
+		while(true) {
+			File file = new File(Options.dataQueueDir,String.format("%d.txt", n));
+			if(!file.exists())
+				break;
+			//load item
+			QueueItem item = QueueItem.load(n);
+			if(item != null)
+				queue.addElement(item);
+			++n;
+		}
+		
+		//delete queue directory
+		if(Options.dataQueueDir.exists()) {
+			//Test first!
+			Options.dataQueueDir.delete();
+		}
 	}
 
 	private void showAddDialog() {
