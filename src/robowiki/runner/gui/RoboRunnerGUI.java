@@ -47,6 +47,7 @@ import javax.swing.KeyStroke;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 
 public class RoboRunnerGUI extends JFrame {
 	private class ThreadController implements BattleOutputHandler {
@@ -425,7 +426,9 @@ public class RoboRunnerGUI extends JFrame {
 		
 		//delete queue directory
 		if(Options.dataQueueDir.exists()) {
-			//Test first!
+			for(File f : Options.dataQueueDir.listFiles()) {
+				f.delete();
+			}
 			Options.dataQueueDir.delete();
 		}
 	}
