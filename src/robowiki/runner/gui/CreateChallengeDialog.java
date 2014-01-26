@@ -34,14 +34,17 @@ import java.awt.GridLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.SpinnerNumberModel;
 
+import robowiki.runner.BotList;
+import robowiki.runner.ChallengeConfig;
+import robowiki.runner.ChallengeConfig.BotListGroup;
 import robowiki.runner.RobotScore.ScoringStyle;
 
-import com.google.common.base.Charsets;
 import com.google.common.io.Files;
 
 import chase.EndsWithFileFilter;
@@ -69,6 +72,12 @@ public class CreateChallengeDialog extends JDialog {
 	private JLabel lblName;
 	private JComboBox<String> boxScoreType;
 	private JSpinner spnRounds;
+	private JLabel lblBattlefield;
+	private JPanel panel;
+	private JLabel lblWidth;
+	private JSpinner spnWidth;
+	private JLabel lblHeight;
+	private JSpinner spnHeight;
 
 	/**
 	 * Create the dialog.
@@ -147,54 +156,38 @@ public class CreateChallengeDialog extends JDialog {
 		return names;
 	}
 
-	/**
-	 * Converts the data from this class into a challenge file
+	
+	
+	/*
+	 * 
 	 */
-	private String createChallengeFileString() {
-		StringBuilder buf = new StringBuilder();
-		buf.append(txtName.getText());
-		buf.append('\n');
-		
-		buf.append(boxScoreType.getSelectedItem());
-		buf.append('\n');
+	private List<BotListGroup> createBotListGroupList() {
+		ArrayList<BotListGroup> botListGroupList = new ArrayList<BotListGroup>();
 
-		buf.append(spnRounds.getValue());
-		buf.append(" rounds\n");
-		
-		buf.append('\n');
-		
-		//create groups
-		boolean first = true;
 		DefaultMutableTreeNode node = (DefaultMutableTreeNode) root.getFirstChild();
 		while (node != null) {
-			if(!first)
-				buf.append("\n\n");
-			first = false;
 			//create group
-			buf.append(node.toString());
-			buf.append(" {\n");
+			String name = node.toString();
 			
+			ArrayList<BotList> botListList = new ArrayList<BotList>();
 			DefaultMutableTreeNode subnode = (DefaultMutableTreeNode) node.getFirstChild();
 			while(subnode != null) {
-				buf.append("    ");
-				buf.append(subnode.toString());
-				buf.append('\n');
+				botListList.add(new BotList(subnode.toString()));
 				subnode = subnode.getNextSibling();
 			}
 			
-			buf.append('}');
-
+			botListGroupList.add(new BotListGroup(name,botListList));
 			node = node.getNextSibling();
 		}
 		
-		return buf.toString();
+		return botListGroupList;
 	}
 
 	private void createDialog() {
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
-		contentPanel.setLayout(new MigLayout("", "[][grow]", "[][][][][grow]"));
+		contentPanel.setLayout(new MigLayout("", "[][grow]", "[][][][][][grow]"));
 		{
 			lblName = new JLabel("Name");
 			contentPanel.add(lblName, "cell 0 0,alignx trailing");
@@ -223,12 +216,39 @@ public class CreateChallengeDialog extends JDialog {
 			contentPanel.add(spnRounds, "cell 1 2,growx");
 		}
 		{
+			lblBattlefield = new JLabel("Battlefield");
+			contentPanel.add(lblBattlefield, "cell 0 3");
+		}
+		{
+			panel = new JPanel();
+			contentPanel.add(panel, "cell 1 3,grow");
+			panel.setLayout(new MigLayout("", "[][grow][][grow]", "[]"));
+			{
+				lblWidth = new JLabel("Width");
+				panel.add(lblWidth, "cell 0 0");
+			}
+			{
+				spnWidth = new JSpinner();
+				spnWidth.setModel(new SpinnerNumberModel(800, 400, 5000, 10));
+				panel.add(spnWidth, "cell 1 0,growx");
+			}
+			{
+				lblHeight = new JLabel("Height");
+				panel.add(lblHeight, "cell 2 0");
+			}
+			{
+				spnHeight = new JSpinner();
+				spnHeight.setModel(new SpinnerNumberModel(600, 400, 5000, 10));
+				panel.add(spnHeight, "cell 3 0,growx");
+			}
+		}
+		{
 			lblGroups = new JLabel("Groups");
-			contentPanel.add(lblGroups, "flowx,cell 0 3,alignx leading");
+			contentPanel.add(lblGroups, "flowx,cell 0 4,alignx leading");
 		}
 		{
 			JPanel groupPanel = new JPanel();
-			contentPanel.add(groupPanel, "cell 0 4 2 1,grow");
+			contentPanel.add(groupPanel, "cell 0 5 2 1,grow");
 			groupPanel.setLayout(new MigLayout("", "[grow][]", "[grow]"));
 			{
 				JScrollPane scrollPane = new JScrollPane();
@@ -518,17 +538,21 @@ public class CreateChallengeDialog extends JDialog {
 			return false;
 		}
 		File file = challengeChooser.getSelectedFile();
-		
 
 		if(!file.getName().endsWith("rrc")) {
 			file = new File(file.getParentFile(),file.getName() + ".rrc");
 		}
 		
-		try {
-			Files.write(createChallengeFileString(), file, Charsets.UTF_8);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		ChallengeConfig config = new ChallengeConfig(
+				txtName.getText(),
+				(int)spnRounds.getValue(),
+				(ScoringStyle)boxScoreType.getSelectedItem(),
+				(int)spnWidth.getValue(),
+				(int)spnHeight.getValue(),
+				createBotListGroupList()
+			);
+		
+		config.save(file);
 
 		return true;
 	}

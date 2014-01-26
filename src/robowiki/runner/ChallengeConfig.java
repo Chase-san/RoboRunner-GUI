@@ -2,11 +2,11 @@ package robowiki.runner;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.List;
 
 import robowiki.runner.RobotScore.ScoringStyle;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -57,7 +57,7 @@ public class ChallengeConfig {
 	
 	public static ChallengeConfig load(File challengeFile) {
 		try {
-			List<String> fileLines = Files.readLines(challengeFile, Charset.defaultCharset());
+			List<String> fileLines = Files.readLines(challengeFile, Charsets.UTF_8);
 			String name = fileLines.get(0);
 			ScoringStyle scoringStyle = ScoringStyle.parseStyle(fileLines.get(1).trim());
 			int rounds = Integer.parseInt(fileLines.get(2).toLowerCase().replaceAll("rounds", "").trim());
@@ -70,6 +70,7 @@ public class ChallengeConfig {
 			int maxBots = 1;
 			for (int x = 3; x < fileLines.size(); x++) {
 				String line = fileLines.get(x).trim();
+				//regex... now we have two problems TODO replace this regex
 				if (line.matches("^\\d+$")) {
 					int value = Integer.parseInt(line);
 					if (width == null) {
@@ -118,7 +119,75 @@ public class ChallengeConfig {
 		}
 		return null;
 	}
+	
+	public void save(String saveFilePath) {
+		save(new File(saveFilePath));
+	}
+	
+	/**
+	 * Saves the challenge file to disk.
+	 */
+	public void save(File saveFile) {
+		try {
+			Files.write(toString(), saveFile, Charsets.UTF_8);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+	}
 
+	/**
+	 * Converts the data from this class into a challenge file.
+	 * @author Chase
+	 */
+	public String toString() {
+		StringBuilder buf = new StringBuilder();
+		
+		buf.append(name);
+		buf.append('\n');
+		
+		buf.append(scoringStyle.toString());
+		buf.append('\n');
+
+		buf.append(rounds);
+		buf.append(" rounds\n");
+		
+		if(battleFieldHeight != 600 || battleFieldWidth != 800) {
+			buf.append(battleFieldWidth);
+			buf.append('\n');
+			buf.append(battleFieldHeight);
+			buf.append('\n');
+		}
+		
+		buf.append('\n');
+		
+		for(BotListGroup group : referenceBotGroups) {
+			if(group.name.length() != 0) {
+				buf.append(group.name);
+				buf.append(" {\n");
+			}
+			
+			//a list of botlists
+			for(BotList botList : group.referenceBots) {
+				buf.append("\t");
+				//create the comma list
+				boolean first = true;
+				for(String botName : botList.getBotNames()) {
+					if(!first)
+						buf.append(", ");
+					first = false;
+					buf.append(botName);
+				}
+				buf.append("\n");
+			}
+			
+			if(group.name.length() != 0) {
+				buf.append("}\n\n");
+			}
+		}
+		
+		return buf.toString();
+	}
+	
 	/**
 	 * Defines a group of robots used in the challenge. 
 	 * @author Voidious
