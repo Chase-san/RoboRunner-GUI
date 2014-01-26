@@ -5,8 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -262,8 +260,8 @@ public class ScoreLog {
 		}
 	}
 	
-	public void saveScoreLog(String outputFilePath) {
-		saveScoreLog(new File(outputFilePath));
+	public void saveXMLScoreLog(String outputFilePath) {
+		saveXMLScoreLog(new File(outputFilePath));
 	}
 
 	/**
@@ -272,7 +270,7 @@ public class ScoreLog {
 	 * @param outputFilePath
 	 *            the path of the output file
 	 */
-	public void saveScoreLog(File outputFile) {
+	public void saveXMLScoreLog(File outputFile) {
 		XMLEventWriter eventWriter = null;
 		GZIPOutputStream gzipOutputStream = null;
 		try {

@@ -31,15 +31,17 @@ public class OptionsDialog extends JDialog {
 	
 	private JFileChooser robocodeChooser = null;
 	private JFileChooser runnerChooser = null;
+	private JFileChooser dataChooser = null;
 	private JFileChooser robotsChooser = null;
 	private JFileChooser challengeChooser = null;
+	private JTextField txtData;
 	
 
 	/**
 	 * Create the dialog.
 	 */
 	public OptionsDialog(Window parent) {
-		setSize(450,334);
+		setSize(450,365);
 		setTitle("Options");
 		setModal(true);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
@@ -87,7 +89,7 @@ public class OptionsDialog extends JDialog {
 		
 		JPanel panel = new JPanel();
 		contentPanel.add(panel, BorderLayout.CENTER);
-		panel.setLayout(new MigLayout("", "[grow][]", "[][][][][][][][][][]"));
+		panel.setLayout(new MigLayout("", "[grow][]", "[][][][][][][][][][][][]"));
 		
 		JLabel lblRobocodeLibDirectory = new JLabel("Robocode Library Directory");
 		panel.add(lblRobocodeLibDirectory, "cell 0 0");
@@ -123,13 +125,30 @@ public class OptionsDialog extends JDialog {
 		});
 		panel.add(btnRunnerBrowse, "cell 1 3");
 		
+		JLabel lblDataDirectory = new JLabel("Data Directory");
+		panel.add(lblDataDirectory, "cell 0 4");
+		
+		txtData = new JTextField();
+		txtData.setEditable(false);
+		txtData.setText(Options.transformPath(Options.dataDir));
+		panel.add(txtData, "cell 0 5,growx");
+		txtData.setColumns(10);
+		
+		JButton btnDataBrowse = new JButton("Browse");
+		btnDataBrowse.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				browseForDataFolder();
+			}
+		});
+		panel.add(btnDataBrowse, "cell 1 5");
+		
 		JLabel lblRobotDirectory = new JLabel("Robot Directory");
-		panel.add(lblRobotDirectory, "cell 0 4");
+		panel.add(lblRobotDirectory, "cell 0 6");
 		
 		txtRobots = new JTextField();
 		txtRobots.setEditable(false);
 		txtRobots.setText(Options.transformPath(Options.robotsDir));
-		panel.add(txtRobots, "cell 0 5,growx");
+		panel.add(txtRobots, "cell 0 7,growx");
 		txtRobots.setColumns(10);
 		
 		JButton btnRobotBrowse = new JButton("Browse");
@@ -138,15 +157,15 @@ public class OptionsDialog extends JDialog {
 				browseForRobotsFolder();
 			}
 		});
-		panel.add(btnRobotBrowse, "cell 1 5");
+		panel.add(btnRobotBrowse, "cell 1 7");
 		
 		JLabel lblChallengeDirectory = new JLabel("Challenge Directory");
-		panel.add(lblChallengeDirectory, "cell 0 6");
+		panel.add(lblChallengeDirectory, "cell 0 8");
 		
 		txtChallenges = new JTextField();
 		txtChallenges.setEditable(false);
 		txtChallenges.setText(Options.transformPath(Options.challengeDir));
-		panel.add(txtChallenges, "cell 0 7,growx");
+		panel.add(txtChallenges, "cell 0 9,growx");
 		txtChallenges.setColumns(10);
 		
 		JButton btnChallengeBrowse = new JButton("Browse");
@@ -155,19 +174,32 @@ public class OptionsDialog extends JDialog {
 				browseForChallengeFolder();
 			}
 		});
-		panel.add(btnChallengeBrowse, "cell 1 7");
+		panel.add(btnChallengeBrowse, "cell 1 9");
 		
 		JLabel lblJvmArguments = new JLabel("Virtual Machine Arguments");
-		panel.add(lblJvmArguments, "cell 0 8");
+		panel.add(lblJvmArguments, "cell 0 10");
 		
 		txtJVMargs = new JTextField();
 		txtJVMargs.setText(Options.jvmArgs);
-		panel.add(txtJVMargs, "cell 0 9,growx");
+		panel.add(txtJVMargs, "cell 0 11,growx");
 		txtJVMargs.setColumns(10);
 		
 		return contentPanel;
 	}
 	
+	private void browseForDataFolder() {
+		if(dataChooser == null) {
+			WindowToolkit.setFileChooserReadOnly(true);
+			dataChooser = new JFileChooser(new File("."));
+			dataChooser.setDialogTitle("Select Data Directory");
+			dataChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+		}
+		if(dataChooser.showOpenDialog(this) != JFileChooser.APPROVE_OPTION) {
+			return;
+		}
+		File file = dataChooser.getSelectedFile();
+		txtData.setText(Options.transformPath(file));
+	}
 	
 	private void browseForRobocodeFolder() {
 		if(robocodeChooser == null) {

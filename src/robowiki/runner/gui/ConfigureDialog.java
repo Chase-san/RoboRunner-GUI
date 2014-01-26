@@ -57,7 +57,8 @@ public class ConfigureDialog extends JDialog {
 		setLocationRelativeTo(parent);
 		
 		challengeName = item.challenge.name;
-		robotAlias = RunnerUtil.getRobotAlias(item.challenger);
+		
+		robotAlias = RunnerUtil.getRobotAlias(item.scoreLog.challenger);
 	}
 	
 	/**

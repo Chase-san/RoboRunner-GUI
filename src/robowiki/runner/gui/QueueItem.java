@@ -15,19 +15,17 @@ public class QueueItem {
 	private List<BotList> battleList;
 	public final ChallengeConfig challenge;
 	public final ScoreLog scoreLog;
-	public final String challenger;
 	private int seasons;
 	
 	public QueueItem(ChallengeConfig challenge, String challenger, int seasons) {
 		this.challenge = challenge;
-		this.challenger = challenger;
 		this.scoreLog = new ScoreLog(challenger);
 		this.seasons = seasons;
 		updateBattleList();
 	}
 	
 	protected void updateBattleList() {
-		this.battleList = Collections.synchronizedList(Lists.newArrayList(RoboRunner.getBattleList(scoreLog, challenge, challenger, seasons)));
+		this.battleList = Collections.synchronizedList(Lists.newArrayList(RoboRunner.getBattleList(scoreLog, challenge, seasons)));
 	}
 	
 	public String getTitle() {
@@ -53,5 +51,11 @@ public class QueueItem {
 	public String toString() {
 		return title;
 	}
-	
+
+	public void save() {
+		//save title
+		//save Challenge
+		//save seasons
+		//save ScoreLog
+	}
 }

@@ -298,7 +298,7 @@ public class RoboRunner {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
-				scoreLog.saveScoreLog(xmlFilePath);
+				scoreLog.saveXMLScoreLog(xmlFilePath);
 			}
 		});
 
@@ -306,13 +306,13 @@ public class RoboRunner {
 			BattleOutputHandler resultHandler = newBattleResultHandler(scoreLog, challenge, challenger, xmlFilePath, errorMap,
 					printWikiFormat);
 			if (_config.smartBattles) {
-				BattleSelector battleSelector = newBattleSelector(getBattleList(scoreLog, challenge, challenger, 2), challenge, challenger,
+				BattleSelector battleSelector = newBattleSelector(getBattleList(scoreLog, challenge, 2), challenge, challenger,
 						errorMap);
 				int numBattles = (_config.seasons) * (_config.challenge.allReferenceBots.size())
 						- scoreLog.getBattleCount(_config.challenge.allReferenceBots);
 				_battleRunner.runBattles(battleSelector, resultHandler, numBattles);
 			} else {
-				_battleRunner.runBattles(getBattleList(scoreLog, challenge, challenger), resultHandler,
+				_battleRunner.runBattles(getBattleList(scoreLog, challenge), resultHandler,
 						challenge.rounds, challenge.battleFieldWidth, challenge.battleFieldHeight);
 			}
 			System.out.println();
@@ -337,16 +337,16 @@ public class RoboRunner {
 		System.out.println();
 	}
 
-	private List<BotList> getBattleList(ScoreLog scoreLog, ChallengeConfig challenge, String challenger) {
-		return getBattleList(scoreLog, challenge, challenger, _config.seasons);
+	private List<BotList> getBattleList(ScoreLog scoreLog, ChallengeConfig challenge) {
+		return getBattleList(scoreLog, challenge, _config.seasons);
 	}
 
-	public static List<BotList> getBattleList(ScoreLog scoreLog, ChallengeConfig challenge, String challenger, int seasons) {
+	public static List<BotList> getBattleList(ScoreLog scoreLog, ChallengeConfig challenge, int seasons) {
 		Map<String, Integer> skipMap = getSkipMap(scoreLog);
 		List<BotList> battleList = Lists.newArrayList();
 		for (int x = 0; x < seasons; x++) {
 			for (BotList botList : challenge.allReferenceBots) {
-				List<String> battleBots = Lists.newArrayList(challenger);
+				List<String> battleBots = Lists.newArrayList(scoreLog.challenger);
 				List<String> botNames = botList.getBotNames();
 				if (!skip(skipMap, scoreLog.getSortedBotList(botNames))) {
 					battleBots.addAll(botNames);
@@ -395,7 +395,7 @@ public class RoboRunner {
 		return new ScoreError(scores, scoreLog.getAverageBattleScore(botList).getElapsedTime());
 	}
 
-	private ScoreLog loadScoreLog(String challengerBot, String filePath) {
+	public static ScoreLog loadScoreLog(String challengerBot, String filePath) {
 		File dataFile = new File(filePath);
 		if (dataFile.exists()) {
 			try {
@@ -648,7 +648,7 @@ public class RoboRunner {
 			@Override
 			public void processResults(int id, List<RobotScore> robotScores, long elapsedTime) {
 				scoreLog.addBattle(robotScores, challenge.rounds, elapsedTime);
-				scoreLog.saveScoreLog(xmlFilePath);
+				scoreLog.saveXMLScoreLog(xmlFilePath);
 
 				String botList = scoreLog.getSortedBotListFromScores(robotScores);
 				BattleScore lastScore = scoreLog.getLastBattleScore(botList);

@@ -72,7 +72,7 @@ public class ResultsDialog extends JDialog {
 		ScoreLog log = item.scoreLog;
 		
 		columns.add("Challenger");
-		data.add(RunnerUtil.getRobotAlias(item.challenger));
+		data.add(RunnerUtil.getRobotAlias(item.scoreLog.challenger));
 		
 		//setup groups and such
 		int index = 0;
