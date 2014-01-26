@@ -76,8 +76,9 @@ public class CreateChallengeDialog extends JDialog {
 	public CreateChallengeDialog(Frame owner) {
 		super(owner);
 		setTitle("Create Challenge");
+		setModal(true);
 		createDialog();
-
+		
 		menu = new JPopupMenu();
 		JMenuItem rename = new JMenuItem("Rename");
 		rename.addActionListener(new ActionListener() {

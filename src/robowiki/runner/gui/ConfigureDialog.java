@@ -47,6 +47,8 @@ public class ConfigureDialog extends JDialog {
 
 	public ConfigureDialog(Window parent, QueueItem item) {
 		super(parent);
+		setModal(true);
+		
 		queueItem = item;
 		setTitle("Configure: " + challengeName);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);

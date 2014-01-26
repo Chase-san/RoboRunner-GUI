@@ -41,6 +41,7 @@ public class OptionsDialog extends JDialog {
 	public OptionsDialog(Window parent) {
 		setSize(450,334);
 		setTitle("Options");
+		setModal(true);
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 		setContentPane(createContentPane());
 		setLocationRelativeTo(parent);
