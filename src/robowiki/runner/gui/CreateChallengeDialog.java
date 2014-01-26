@@ -35,7 +35,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.SpinnerNumberModel;
@@ -151,8 +150,6 @@ public class CreateChallengeDialog extends JDialog {
 			names[i] = Files.getNameWithoutExtension(files[i].getName()).replace('_', ' ');
 		}
 		
-		System.out.println(Arrays.toString(names));
-
 		return names;
 	}
 
@@ -194,6 +191,7 @@ public class CreateChallengeDialog extends JDialog {
 		}
 		{
 			txtName = new JTextField();
+			txtName.setToolTipText("The challenge name.");
 			contentPanel.add(txtName, "cell 1 0,growx");
 			txtName.setColumns(10);
 		}
@@ -203,6 +201,7 @@ public class CreateChallengeDialog extends JDialog {
 		}
 		{
 			boxScoreType = new JComboBox<String>();
+			boxScoreType.setToolTipText("The type of scoring.");
 			boxScoreType.setModel(new DefaultComboBoxModel(ScoringStyle.values()));
 			contentPanel.add(boxScoreType, "cell 1 1,growx");
 		}
@@ -212,6 +211,7 @@ public class CreateChallengeDialog extends JDialog {
 		}
 		{
 			spnRounds = new JSpinner();
+			spnRounds.setToolTipText("Number of rounds in each battle.");
 			spnRounds.setModel(new SpinnerNumberModel(new Integer(1), new Integer(1), null, new Integer(1)));
 			contentPanel.add(spnRounds, "cell 1 2,growx");
 		}
@@ -229,6 +229,7 @@ public class CreateChallengeDialog extends JDialog {
 			}
 			{
 				spnWidth = new JSpinner();
+				spnWidth.setToolTipText("Default is 800");
 				spnWidth.setModel(new SpinnerNumberModel(800, 400, 5000, 10));
 				panel.add(spnWidth, "cell 1 0,growx");
 			}
@@ -238,6 +239,7 @@ public class CreateChallengeDialog extends JDialog {
 			}
 			{
 				spnHeight = new JSpinner();
+				spnHeight.setToolTipText("Default is 600");
 				spnHeight.setModel(new SpinnerNumberModel(600, 400, 5000, 10));
 				panel.add(spnHeight, "cell 3 0,growx");
 			}
@@ -275,6 +277,7 @@ public class CreateChallengeDialog extends JDialog {
 				buttonPanel.setLayout(new GridLayout(0, 1, 0, 0));
 				{
 					JButton btnAddGroup = new JButton("Add Group");
+					btnAddGroup.setToolTipText("Adds a robot group, at least one group is required.");
 					btnAddGroup.addActionListener(new ActionListener() {
 						@Override
 						public void actionPerformed(ActionEvent e) {
@@ -285,7 +288,7 @@ public class CreateChallengeDialog extends JDialog {
 					buttonPanel.add(btnAddGroup);
 				}
 				{
-					btnAddRobot = new JButton("Add Robot");
+					btnAddRobot = new JButton("Add Robot(s)");
 					btnAddRobot.setEnabled(false);
 					btnAddRobot.addActionListener(new ActionListener() {
 						@Override
